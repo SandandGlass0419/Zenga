@@ -142,6 +142,7 @@ public class Board
         return HeightIndex;
     }
 
+    // logic testing
     // validate position (CoG)
     // validate move (block already there?, placed in valid?) ok
 }
