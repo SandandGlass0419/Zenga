@@ -25,20 +25,6 @@ public class Board
 
         this.side = side;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void RemoveBlock(BlockMove block)
-    {
-        Tower[block.slotIndex] = block.RemoveFrom(Tower[block.slotIndex]);
-        UpdateHeightIndexRemoved(block);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void PlaceBlock(BlockMove block)
-    {
-        Tower[block.slotIndex] = block.PlaceTo(Tower[block.slotIndex]);
-        UpdateHeightIndexPlaced(block);
-    }
     
     public void InitPos()
     {
@@ -50,6 +36,18 @@ public class Board
         }
 
         HeightIndex = Height - 1;
+    }
+
+    public void RemoveBlock(BlockMove block)
+    {
+        Tower[block.slotIndex] = block.RemoveFrom(Tower[block.slotIndex]);
+        UpdateHeightIndexRemoved(block);
+    }
+
+    public void PlaceBlock(BlockMove block)
+    {
+        Tower[block.slotIndex] = block.PlaceTo(Tower[block.slotIndex]);
+        UpdateHeightIndexPlaced(block);
     }
 
     public void ApplyMove(BlockMove removingBlock, BlockMove placingBlock)
@@ -114,7 +112,7 @@ public class Board
         return (byte)(towerBlock & movingBlock) == movingBlock;
     }
 
-    public int GetEffectiveIndex()
+    public int GetHeightIndex()
     {
         for (int i = maxHeight - 1; i >= 0; i--)
         {

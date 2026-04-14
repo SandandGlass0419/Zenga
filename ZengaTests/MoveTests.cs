@@ -5,9 +5,7 @@ namespace ZengaTests;
 public class MoveTests
 {
     [SetUp]
-    public void Setup()
-    {
-    }
+    public void Setup() {}
 
     [TestCase(1)]
     [TestCase(0)]
@@ -52,6 +50,7 @@ public class MoveTests
     public void PlaceCombinationMultiple(byte tower, byte block)
     {
         BlockMove blockMove = new(block, 0);
+        
 
         var result = blockMove.PlaceTo(tower);
 
