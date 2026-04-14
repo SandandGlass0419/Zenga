@@ -25,20 +25,6 @@ public class Board
 
         this.side = side;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void RemoveBlock(BlockMove block)
-    {
-        Tower[block.slotIndex] = block.RemoveFrom(Tower[block.slotIndex]);
-        UpdateHeightIndexRemoved(block);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void PlaceBlock(BlockMove block)
-    {
-        Tower[block.slotIndex] = block.PlaceTo(Tower[block.slotIndex]);
-        UpdateHeightIndexPlaced(block);
-    }
     
     public void InitPos()
     {
@@ -50,6 +36,18 @@ public class Board
         }
 
         HeightIndex = Height - 1;
+    }
+
+    public void RemoveBlock(BlockMove block)
+    {
+        Tower[block.slotIndex] = block.RemoveFrom(Tower[block.slotIndex]);
+        UpdateHeightIndexRemoved(block);
+    }
+
+    public void PlaceBlock(BlockMove block)
+    {
+        Tower[block.slotIndex] = block.PlaceTo(Tower[block.slotIndex]);
+        UpdateHeightIndexPlaced(block);
     }
 
     public void ApplyMove(BlockMove removingBlock, BlockMove placingBlock)
@@ -92,27 +90,29 @@ public class Board
         }
     }
 
-    public bool IsBlank(BlockMove block)
+    public bool ValidatePlace(BlockMove block)
     {
-        return (byte)((byte)(Tower[block.slotIndex] ^ block.movingBlock) & block.movingBlock) == block.movingBlock;
+        return ValidatePlace(Tower[block.slotIndex], block.movingBlock);
     }
 
-    public bool IsBlank(byte towerBlock, byte movingBlock)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool ValidatePlace(byte towerBlock, byte movingBlock)  // 1, 1 => false
     {
-        return (byte)((byte)(towerBlock ^ movingBlock) & movingBlock) == movingBlock;
+        return (towerBlock & movingBlock) == 0;
     }
 
-    public bool IsFilled(BlockMove block)
+    public bool ValidateRemove(BlockMove block)
     {
-        return (byte)(Tower[block.slotIndex] & block.movingBlock) == block.movingBlock;
+        return ValidateRemove(Tower[block.slotIndex], block.movingBlock);
     }
 
-    public bool IsFilled(byte towerBlock, byte movingBlock)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool ValidateRemove(byte towerBlock, byte movingBlock) // 0, 1 => false
     {
         return (byte)(towerBlock & movingBlock) == movingBlock;
     }
 
-    public int GetEffectiveIndex()
+    public int GetHeightIndex()
     {
         for (int i = maxHeight - 1; i >= 0; i--)
         {
@@ -160,7 +160,7 @@ public readonly struct BlockMove
         this.slotIndex = slotIndex;
     }
 
-    public BlockMove(int blockIndex, int slotIndex)
+    public BlockMove(int blockIndex, int slotIndex) // 0-7, -1 = blank
     {
         this.movingBlock = (byte)(1 << blockIndex);
         this.slotIndex = slotIndex;

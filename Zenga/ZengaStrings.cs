@@ -4,7 +4,7 @@ namespace Zenga;
 
 public partial class ZengaStrings
 {
-    public string ExportBoard(Board board)
+    public static string BoardToString(Board board)
     {
         string[] fields = new string[4];
 
@@ -21,7 +21,7 @@ public partial class ZengaStrings
 
 public partial class ZengaStrings
 {
-    public Board? ImportBoard(string strBoard)
+    public static Board? StringToBoard(string strBoard)
     {
         var splitFields = strBoard.Split(' ');
 
@@ -37,15 +37,17 @@ public partial class ZengaStrings
         var splitLayers = splitFields[0].Split('/');
         if (!ValidLayers(splitLayers, ref board)) return null;
 
+        board.HeightIndex = board.GetHeightIndex();
+
         return board;
     }
 
-    private bool ValidSide(string side)
+    private static bool ValidSide(string side)
     {
         return side == Side.W.ToString() || side == Side.B.ToString();
     }
 
-    private bool ValidDimention(string strDimSize, out int dimSize)
+    private static bool ValidDimention(string strDimSize, out int dimSize)
     {
         dimSize = 0;
         if (!int.TryParse(strDimSize, out int result)) return false;
@@ -56,7 +58,7 @@ public partial class ZengaStrings
         return true;
     }
 
-    private bool ValidLayers(string[] strLayers, ref Board board)
+    private static bool ValidLayers(string[] strLayers, ref Board board)
     {
         byte maxBlock = (byte)((1 << board.Width) - 1);
 
