@@ -100,7 +100,7 @@ public class BoardTests
         
         board.RemoveBlock(new((byte)0b111, 17));
 
-        Assert.That(board.HeightIndex, Is.EqualTo(16));
+        Assert.That(board.heightIndex, Is.EqualTo(16));
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class BoardTests
         
         board.PlaceBlock(new((byte)0b111, 19));
         
-        Assert.That(board.HeightIndex, Is.EqualTo(19));
+        Assert.That(board.heightIndex, Is.EqualTo(19));
     }
 
     [Test]

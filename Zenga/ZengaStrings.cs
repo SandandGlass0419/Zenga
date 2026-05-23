@@ -37,7 +37,7 @@ public partial class ZengaStrings
         var splitLayers = splitFields[0].Split('/');
         if (!ValidLayers(splitLayers, ref board)) return null;
 
-        board.HeightIndex = board.GetHeightIndex();
+        board.heightIndex = board.GetHeightIndex();
 
         return board;
     }

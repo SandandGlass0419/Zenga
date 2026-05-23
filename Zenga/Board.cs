@@ -4,9 +4,17 @@ namespace Zenga;
 
 public class Board
 {
-    public byte[] Tower { get; init; }
+    public byte[] Tower
+    {
+        get;
+        init
+        {
+            field = value;
+            this.heightIndex = GetHeightIndex();
+        }
+    }
 
-    public int HeightIndex;
+    public int heightIndex;
     
     public readonly int Height;
     public readonly int Width;
@@ -19,10 +27,10 @@ public class Board
         this.Height = height;
         this.Width = Width <= 8 ? Width : 8;
         this.maxHeight = this.Width * this.Height;
-
+        
         this.Tower = new byte[maxHeight];
-        this.HeightIndex = 0;
-
+        // heightIndex set on init; setter
+        
         this.side = side;
     }
     
@@ -35,7 +43,7 @@ public class Board
             Tower[i] = layer;
         }
 
-        HeightIndex = Height - 1;
+        heightIndex = Height - 1;
     }
 
     public void RemoveBlock(BlockMove block)
@@ -124,22 +132,22 @@ public class Board
 
     public int UpdateHeightIndexPlaced(BlockMove block) // accounts the highest layer with at least 1 block.
     {
-        if (block.slotIndex > HeightIndex && Tower[block.slotIndex] != 0)
+        if (block.slotIndex > heightIndex && Tower[block.slotIndex] != 0)
         {
-            HeightIndex = block.slotIndex;
+            heightIndex = block.slotIndex;
         }
         
-        return HeightIndex;
+        return heightIndex;
     }
 
     public int UpdateHeightIndexRemoved(BlockMove block)
     {
-        if (block.slotIndex == HeightIndex && Tower[block.slotIndex] == 0)
+        if (block.slotIndex == heightIndex && Tower[block.slotIndex] == 0)
         {
-            HeightIndex -= block.slotIndex > 0 ? 1 : 0;
+            heightIndex -= block.slotIndex > 0 ? 1 : 0;
         }
 
-        return HeightIndex;
+        return heightIndex;
     }
 
     // logic testing
@@ -193,8 +201,25 @@ public readonly struct BlockMove
 
 public enum Axis
 {
+    NONE = -1,
     X = 0,
-    Z = 1,
+    Y = 1,
+}
+
+public static class AxisMethods
+{
+    public static Axis Cycle(this Axis axis)
+    {
+        switch (axis)
+        {
+            case Axis.X:
+                return Axis.Y;
+            case Axis.Y:
+                return Axis.X;
+            default:
+                return Axis.NONE;
+        }
+    }
 }
 
 public enum Side
