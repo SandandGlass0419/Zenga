@@ -2,54 +2,124 @@ namespace Zenga;
 
 public abstract class Balancing
 {
-    public decimal[] Bal { get; set; }
-    public decimal ZBal = 0;
+    public decimal[] Balance { get; init; }
+    public decimal maxBalance;
+    public decimal ZBalance;
     public int Width;
-
-    public Balancing(Board board)
-    {
-        this.Bal = new decimal[board.Height];
-        this.Width = board.Width;
-    }
-
+    
     public Balancing(int height, int width)
     {
-        Bal = new decimal[height];
+        Balance = new decimal[height];
         this.Width = width;
+    }
+
+    public void SetBalance(int index, decimal value)
+    {
+        Balance[index] = value;
+        maxBalance = Math.Abs(value) > Math.Abs(maxBalance) ? value : maxBalance;
     }
     
     public abstract decimal Calculate(Board board);
-    public abstract decimal Update(Move move);
     //public abstract decimal GetLegalMoves();
+    //public abstract decimal Update(Move move);
 }
 
-public class WeightBalancing : Balancing
+public class CoGBalancing : Balancing
 {
     public decimal endBlockCoG;
-    private int  
-    
-    public WeightBalancing(Board board) : base(board)
+    private decimal batchMass;
+    private decimal[] batchCoG = [0, 0];
+
+    public CoGBalancing(int height, int width) : base(height, width)
     {
-        this.endBlockCoG = (Width - 1) / (decimal)2;
+        this.endBlockCoG = (width - 1) / 2m;
     }
-    public WeightBalancing(int height, int width) : base(height, width) {}
 
     public override decimal Calculate(Board board)
     {
-        throw new NotImplementedException();
+        Axis axis = (Axis)(board.heightIndex % 2);
+
+        UpdateBatchCoG(board.Tower[board.heightIndex], axis);
+        axis = axis.Cycle();
+        
+        for (int i = board.heightIndex - 1; i >= 0; i--)
+        {
+            SetBalance(i, GetBalance(board.Tower[i], axis));
+            UpdateBatchCoG(board.Tower[i], axis);
+
+            axis = axis.Cycle();
+        }
+
+        return maxBalance;
     }
 
-    public override decimal Update(Move move)
+    public decimal GetBalance(byte supportLayer, Axis axis)
     {
-        throw new NotImplementedException();
+        var range = GetSupportRange(supportLayer);
+        decimal center = (range.Item1 + range.Item2) / 2;
+        decimal rangeLen = (range.Item2 - range.Item1) / 2;
+
+        return (batchCoG[(int)axis] - center) / rangeLen;
     }
 
-    public decimal Aggregate()
+    public Tuple<decimal, decimal> GetSupportRange(byte supportLayer)
     {
-        throw new NotImplementedException();
+        decimal min = 0, max = 0;
+        bool foundMax = false;
+        
+        for (int i = 0; i < 8; i++)
+        {
+            if ((supportLayer >> i) % 2 != 1) continue;
+
+            if (!foundMax)
+            {
+                max = Width / 2m - i;
+                foundMax = true;
+            }
+            
+            min = Width / 2m - i - 1;
+        }
+
+        return new(min, max);
     }
 
-    public decimal GetLayerCoG(byte layer, int mass)
+    public void UpdateBatchCoG(byte layer, Axis axis)
+    {
+        batchCoG[(int)axis] = BatchCoGFront(layer, axis);
+        
+        batchCoG[(int)axis.Cycle()] = BatchCoGSide(layer, axis.Cycle());
+
+        batchMass += GetLayerMass(layer);
+    }
+    
+    public decimal BatchCoGFront(byte layer, Axis axis)
+    {
+        decimal layerMass = GetLayerMass(layer);
+        decimal layerCoG = GetLayerCoG(layer, layerMass);
+
+        return (batchCoG[(int)axis] * batchMass + layerCoG * layerMass) / (batchMass + layerMass);
+    }
+
+    public decimal BatchCoGSide(byte layer, Axis axis)
+    {
+        decimal layerMass = GetLayerMass(layer);
+        
+        return (batchCoG[(int)axis] * batchMass) / (batchMass + layerMass); // layerCoG = 0
+    }
+
+    public decimal GetLayerMass(byte layer)
+    {
+        int mass = 0;
+
+        for (int i = 0; i < 8; i++)
+        {
+            mass += (layer >> i) % 2 == 1 ? 1 : 0;
+        }
+
+        return mass;
+    }
+
+    public decimal GetLayerCoG(byte layer, decimal mass)
     {
         decimal CoGSum = 0;
         

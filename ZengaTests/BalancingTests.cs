@@ -1,0 +1,70 @@
+using Zenga;
+
+namespace ZengaTests;
+
+public class CoGTests
+{
+    public Board board = new();
+    public CoGBalancing balancing;
+
+    [SetUp]
+    public void Setup()
+    {
+        balancing = new(board.Height, board.Width);
+    }
+
+    [TestCase(0b1011)]
+    public void GetMassTest(byte layer)
+    {
+        var mass = balancing.GetLayerMass(layer);
+
+        Assert.That(mass, Is.EqualTo(3m));
+    }
+
+    [TestCase(0b101)]
+    public void GetCoGTest(byte layer)
+    {
+        balancing = new(18, 3);
+        var CoG = balancing.GetLayerCoG(layer, balancing.GetLayerMass(layer));
+        
+        Assert.That(CoG, Is.EqualTo(0));
+    }
+
+    [TestCase(0b100, Axis.X, 0b011)]
+    public void UpdateCoGTest(byte layer, Axis axis, byte layer2)
+    {
+        balancing.UpdateBatchCoG(layer, axis);
+        
+        balancing.UpdateBatchCoG(layer2, axis.Cycle());
+        
+        Assert.Pass();
+    }   
+    
+    [TestCase(0b100, 0b011, 0b100)]
+    public void BalanceTest(byte layer, byte layer1, byte layer2)
+    {
+        balancing.UpdateBatchCoG(layer, Axis.X);
+
+        var balance1 = balancing.GetBalance(layer1, Axis.Y);
+        balancing.UpdateBatchCoG(layer1, Axis.Y);
+
+        var balance2 = balancing.GetBalance(layer2, Axis.X);
+        balancing.UpdateBatchCoG(layer2, Axis.X);
+        
+        Assert.Pass();
+    }
+
+    [Test]
+    public void CalculateTest()
+    {
+        Board testBoard = new(height: 3)
+        {
+            Tower = [0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0] // height * width
+        };
+
+        CoGBalancing testBalance = new(testBoard.Height, testBoard.Width);
+        var maxbal = testBalance.Calculate(testBoard);
+        
+        Assert.Pass();
+    }
+}
