@@ -54,12 +54,13 @@ public class CoGTests
         Assert.Pass();
     }
 
-    [Test]
-    public void CalculateTest()
+    [TestCase(new byte[] {5, 1, 2, 1, 3, 3, 1, 1, 0})]
+    [TestCase(new byte[] {0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0})]
+    public void CalculateTest(byte[] tower)
     {
         Board testBoard = new(height: 3)
         {
-            Tower = [0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0] // height * width
+            Tower = tower // height * width
         };
 
         CoGBalancing testBalance = new(testBoard.Height, testBoard.Width);

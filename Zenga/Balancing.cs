@@ -4,19 +4,24 @@ public abstract class Balancing
 {
     public decimal[] Balance { get; init; }
     public decimal maxBalance;
-    public decimal ZBalance;
+    public Axis maxBalAxis;
     public int Width;
     
     public Balancing(int height, int width)
     {
-        Balance = new decimal[height];
+        Balance = new decimal[height * width];
         this.Width = width;
     }
 
-    public void SetBalance(int index, decimal value)
+    public void SetBalance(int index, decimal value, Axis axis)
     {
         Balance[index] = value;
-        maxBalance = Math.Abs(value) > Math.Abs(maxBalance) ? value : maxBalance;
+
+        if (Math.Abs(value) > Math.Abs(maxBalance))
+        {
+            maxBalance = value;
+            maxBalAxis = axis;
+        }
     }
     
     public abstract decimal Calculate(Board board);
@@ -44,7 +49,7 @@ public class CoGBalancing : Balancing
         
         for (int i = board.heightIndex - 1; i >= 0; i--)
         {
-            SetBalance(i, GetBalance(board.Tower[i], axis));
+            SetBalance(i, GetBalance(board.Tower[i], axis), axis);
             UpdateBatchCoG(board.Tower[i], axis);
 
             axis = axis.Cycle();
