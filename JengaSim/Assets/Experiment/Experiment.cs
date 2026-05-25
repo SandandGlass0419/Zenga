@@ -15,7 +15,7 @@ public partial class Experiment : MonoBehaviour
 
         Time.timeScale = 1;
         
-        RunNew(new byte[] {5, 6, 2, 5, 3, 3, 1, 2, 2});
+        RunNew(new byte[] {5, 6, 2, 4, 3, 3, 1, 0, 0});
     }
     
     public void PlaceLayer(byte layer, int index, Axis axis)
@@ -57,11 +57,18 @@ public partial class Experiment : MonoBehaviour
 public partial class Experiment
 {
     public int LeftBlocks { get; set; }
+    public CoGBalancing Balancer { get; set; } = new(3, 3);
+    public decimal lastCoGResult;
 
     public void RunNew(byte[] tower)
     {
         PlaceTower(tower);
         LeftBlocks = Tower.Count;
+
+        Board board = new(3, 3) { Tower = tower };
+
+        lastCoGResult = Balancer.Calculate(board);
+        Debug.Log(lastCoGResult);
     }
     
     public void MotionFinished(object sender, MotionFinishedEventArgs e)

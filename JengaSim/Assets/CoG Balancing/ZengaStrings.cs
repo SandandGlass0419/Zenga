@@ -1,7 +1,7 @@
 // lay1(decimal)/lay2/lay3/.../layn start_width start_height side
-public partial class ZengaStrings
+public static partial class ZengaStrings
 {
-    public static string BoardToString(Board board)
+    public static string BoardToString(this Board board)
     {
         string[] fields = new string[4];
 
@@ -16,9 +16,9 @@ public partial class ZengaStrings
     }
 }
 
-public partial class ZengaStrings
+public static partial class ZengaStrings
 {
-    public static Board? StringToBoard(string strBoard)
+    public static Board? StringToBoard(this string strBoard)
     {
         var splitFields = strBoard.Split(' ');
 
