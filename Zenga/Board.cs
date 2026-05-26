@@ -203,7 +203,7 @@ public enum Axis
 {
     NONE = -1,
     X = 0,
-    Y = 1,
+    Z = 1,
 }
 
 public static class AxisMethods
@@ -213,8 +213,8 @@ public static class AxisMethods
         switch (axis)
         {
             case Axis.X:
-                return Axis.Y;
-            case Axis.Y:
+                return Axis.Z;
+            case Axis.Z:
                 return Axis.X;
             default:
                 return Axis.NONE;

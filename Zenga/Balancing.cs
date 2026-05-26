@@ -2,28 +2,19 @@ namespace Zenga;
 
 public abstract class Balancing
 {
-    public decimal[] Balance { get; init; }
-    public decimal maxBalance;
-    public Axis maxBalAxis;
-    public int Width;
+    public decimal[] Balance { get; set; }
+    
+    public readonly int height;
+    public readonly int width;
     
     public Balancing(int height, int width)
     {
         Balance = new decimal[height * width];
-        this.Width = width;
+        this.height = height;
+        this.width = width;
     }
 
-    public void SetBalance(int index, decimal value, Axis axis)
-    {
-        Balance[index] = value;
-
-        if (Math.Abs(value) > Math.Abs(maxBalance))
-        {
-            maxBalance = value;
-            maxBalAxis = axis;
-        }
-    }
-    
+    public abstract void Reset();
     public abstract decimal Calculate(Board board);
     //public abstract decimal GetLegalMoves();
     //public abstract decimal Update(Move move);
@@ -31,7 +22,7 @@ public abstract class Balancing
 
 public class CoGBalancing : Balancing
 {
-    public decimal endBlockCoG;
+    private readonly decimal endBlockCoG;
     private decimal batchMass;
     private decimal[] batchCoG = [0, 0];
 
@@ -40,8 +31,17 @@ public class CoGBalancing : Balancing
         this.endBlockCoG = (width - 1) / 2m;
     }
 
+    public override void Reset()
+    {
+        Balance = new decimal[height * width];
+        batchMass = 0;
+        batchCoG = new decimal[] { 0, 0 };
+    }
+
     public override decimal Calculate(Board board)
     {
+        decimal maxBal = 0;
+        
         Axis axis = (Axis)(board.heightIndex % 2);
 
         UpdateBatchCoG(board.Tower[board.heightIndex], axis);
@@ -49,13 +49,17 @@ public class CoGBalancing : Balancing
         
         for (int i = board.heightIndex - 1; i >= 0; i--)
         {
-            SetBalance(i, GetBalance(board.Tower[i], axis), axis);
+            decimal bal = GetBalance(board.Tower[i], axis);
+            Balance[i] = bal;
+            
+            maxBal = Math.Abs(bal) > Math.Abs(maxBal) ? bal : maxBal;
+            
             UpdateBatchCoG(board.Tower[i], axis);
 
             axis = axis.Cycle();
         }
 
-        return maxBalance;
+        return maxBal;
     }
 
     public decimal GetBalance(byte supportLayer, Axis axis)
@@ -78,11 +82,11 @@ public class CoGBalancing : Balancing
 
             if (!foundMax)
             {
-                max = Width / 2m - i;
+                max = width / 2m - i;
                 foundMax = true;
             }
             
-            min = Width / 2m - i - 1;
+            min = width / 2m - i - 1;
         }
 
         return new(min, max);
@@ -128,7 +132,7 @@ public class CoGBalancing : Balancing
     {
         decimal CoGSum = 0;
         
-        for (int i = 0; i < Width; i++)
+        for (int i = 0; i < width; i++)
         {
             CoGSum += (layer >> i) % 2 == 1 ? endBlockCoG - i : 0;
         }

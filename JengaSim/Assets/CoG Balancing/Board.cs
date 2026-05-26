@@ -7,7 +7,7 @@ public class Board
     
     public byte[] Tower
     {
-        get { return tower; }
+        get => tower;
         set
         {
             tower = value;

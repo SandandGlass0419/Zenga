@@ -10,7 +10,7 @@ public class CoGTests
     [SetUp]
     public void Setup()
     {
-        balancing = new(board.Height, board.Width);
+        balancing = new(3, 3);
     }
 
     [TestCase(0b1011)]
@@ -45,8 +45,8 @@ public class CoGTests
     {
         balancing.UpdateBatchCoG(layer, Axis.X);
 
-        var balance1 = balancing.GetBalance(layer1, Axis.Y);
-        balancing.UpdateBatchCoG(layer1, Axis.Y);
+        var balance1 = balancing.GetBalance(layer1, Axis.Z);
+        balancing.UpdateBatchCoG(layer1, Axis.Z);
 
         var balance2 = balancing.GetBalance(layer2, Axis.X);
         balancing.UpdateBatchCoG(layer2, Axis.X);
@@ -54,6 +54,7 @@ public class CoGTests
         Assert.Pass();
     }
 
+    [TestCase(new byte[] {2,2,2,2,2,2,2,2,2})]
     [TestCase(new byte[] {5, 6, 2, 5, 3, 3, 1, 0, 0})]
     [TestCase(new byte[] {0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0})]
     public void CalculateTest(byte[] tower)
@@ -63,8 +64,8 @@ public class CoGTests
             Tower = tower // height * width
         };
 
-        CoGBalancing testBalance = new(testBoard.Height, testBoard.Width);
-        var maxbal = testBalance.Calculate(testBoard);
+        //CoGBalancing testBalance = new(testBoard.Height, testBoard.Width);
+        var maxbal = balancing.Calculate(testBoard);
         
         Assert.Pass();
     }

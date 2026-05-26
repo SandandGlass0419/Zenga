@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9010061772696650042}
   - component: {fileID: 5100757506358849358}
   - component: {fileID: 9192084204368554488}
-  - component: {fileID: -9204994977909101238}
+  - component: {fileID: -9071822874965135068}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -141,7 +141,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-9204994977909101238
+--- !u!114 &-9071822874965135068
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,5 +152,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ce9e20d76cedef0b9a2af57fd21ef0f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
-  PlaneObject: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::MotionObserve
