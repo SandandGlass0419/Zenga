@@ -27,7 +27,7 @@ public partial class Experiment : MonoBehaviour
     
     public void PlaceLayer(byte layer, int index, Axis axis)
     {
-        foreach (var blockAttribute in BlockStateBuilder.BuildLayerBlockState(layer, index, axis))
+        foreach (var blockAttribute in BlockStateBuilder.BuildLayerIdentity(layer, index, axis))
         {
             PlaceBlock(blockAttribute);
         }
@@ -186,51 +186,27 @@ public partial class Experiment
 public class BlockStateBuilder
 {
     private Vector3 blockScale;
-    public Vector3 BlockScale
-    {
-        get { return blockScale; }
-        set
-        {
-            blockScale = value;
-            endBlockPos = (towerWidth - 1) * value.x / 2f;
-            endBlockY = value.y / 2;
-        }
-    }
-
     private int towerWidth;
-    public int TowerWidth
-    {
-        get { return towerWidth; }
-        set
-        {
-            towerWidth = value;
-            endBlockPos = (value - 1) * blockScale.x / 2f;
-        }
-    }
-
-    public float endBlockPos { get; private set; }
-    public float endBlockY { get; private set; }
+    public float endBlockPos;
+    public float endBlockY;
     
     public BlockStateBuilder(Vector3 blockScale, int towerWidth)
     {
-        this.BlockScale = blockScale;
-        this.TowerWidth = towerWidth;
+        this.blockScale = blockScale;
+        this.towerWidth = towerWidth;
+        this.endBlockPos = (towerWidth - 1) * blockScale.x / 2f;
+        this.endBlockY = blockScale.y / 2f;
     }
 
-    public List<BlockState> BuildLayerBlockState(byte layer, int index, Axis axis) // height by index
+    public List<BlockState> BuildLayerIdentity(byte layer, int index, Axis axis) // height by index
     {
         List<BlockState> blockStates = new();
         
         for (int i = 0; i < 8; i++)
         {
             if ((layer >> i) % 2 != 1) continue;
-
-            Vector3 basePos = new(0, endBlockY + index * blockScale.y, 0);
-            Vector3 newPos = GetPosition(axis, basePos, endBlockPos - i);
-
-            Quaternion quat = GetQuaternion(axis);
             
-            blockStates.Add(new(index, axis, newPos, quat));
+            blockStates.Add(new(index, (byte)(1 << i), axis));
         }
 
         return blockStates;
@@ -240,24 +216,14 @@ public class BlockStateBuilder
     {
         List<BlockState> blockStates = new();
         
-        byte layer = (byte)(Math.Pow(2, TowerWidth) - 1);
+        byte layer = (byte)((1 << (towerWidth - 1)) - 1);
 
-        blockStates.AddRange(BuildLayerBlockState(layer, block.index + 1, block.axis.Cycle()));     // upper
-        blockStates.AddRange(BuildLayerBlockState(layer, block.index, block.axis));                 // this
-        blockStates.AddRange(BuildLayerBlockState(layer, block.index - 1, block.axis.Cycle()));     // under
+        blockStates.AddRange(BuildLayerIdentity(layer, block.index + 1, block.axis.Cycle()));     // upper
+        blockStates.AddRange(BuildLayerIdentity(layer, block.index, block.axis));                 // this
+        blockStates.AddRange(BuildLayerIdentity(layer, block.index - 1, block.axis.Cycle()));     // under
 
         blockStates.Remove(block);
 
         return blockStates;
-    }
-
-    public Quaternion GetQuaternion(Axis axis)
-    {
-        return axis == Axis.Z ? Quaternion.Euler(0, -90, 0) : Quaternion.identity;
-    }
-
-    public Vector3 GetPosition(Axis axis, Vector3 basePos, float size)
-    {
-        return basePos + (axis == Axis.Z ? new(0, 0, size) : new(size, 0, 0));
     }
 }

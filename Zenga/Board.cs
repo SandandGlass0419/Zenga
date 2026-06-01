@@ -163,7 +163,12 @@ public enum Axis
 
 public static class AxisMethods
 {
-    public static void Cycle(ref this Axis axis)
+    public static Axis Cycle(this Axis axis)
+    {
+        return axis == Axis.Z ? Axis.X : Axis.Z;
+    }
+    
+    public static void RefCycle(ref this Axis axis)
     {
         axis = axis == Axis.Z ? Axis.X : Axis.Z;
     }

@@ -72,7 +72,7 @@ public class CoGBalancing : Balancing
         Axis axis = (Axis)(board.heightIndex % 2);
 
         UpdateBatchCoG(board.Tower[board.heightIndex], axis);
-        axis.Cycle();
+        axis.RefCycle();
         
         for (int i = board.heightIndex - 1; i >= 0; i--)
         {
@@ -83,7 +83,7 @@ public class CoGBalancing : Balancing
             
             UpdateBatchCoG(board.Tower[i], axis);
 
-            axis.Cycle();
+            axis.RefCycle();
         }
 
         return MaxBalance;
@@ -125,7 +125,7 @@ public class CoGBalancing : Balancing
     {
         SetBatchCoG(axis, BatchCoGFront(layer, axis));
 
-        axis.Cycle();
+        axis.RefCycle();
         
         SetBatchCoG(axis, BatchCoGSide(layer, axis));
 

@@ -34,7 +34,7 @@ public class CoGTests
     public void UpdateCoGTest(byte layer, Axis axis, byte layer2)
     {
         balancing.UpdateBatchCoG(layer, axis);
-        axis.Cycle();
+        axis.RefCycle();
         balancing.UpdateBatchCoG(layer2, axis);
         
         Assert.Pass();

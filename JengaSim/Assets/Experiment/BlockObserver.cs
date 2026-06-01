@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class BlockObserver : MonoBehaviour
 {
-    public BlockState StartBlockState { get; set; }
-    public List<BlockState> Neighbors { get; set; }
+    public BlockState StartBlockState;
+    public List<BlockState> Neighbors;
     
     private Rigidbody rigidBody;
     private float startTime;
 
     public event EventHandler<MotionFinishedEventArgs> MotionFinishedEvent;
-    private bool finished = false;
+    public bool finished = false;
 
     public void Initialize(BlockState startBlockState, List<BlockState> neighbors)
     {
@@ -30,10 +30,10 @@ public class BlockObserver : MonoBehaviour
         OnFinish(TestState.PASS);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    public void OnCollisionEnter(Collision collision)
     {
         if (finished) return;
-        if (StartBlockState.index <= 0) return;
+        if (StartBlockState.index <= 0) return; // excluding base blocks (index = 0)
          
         if (collision.gameObject.name == "Plane")
         {
@@ -52,8 +52,10 @@ public class BlockObserver : MonoBehaviour
     public void OnFinish(TestState state)
     {
         finished = true;
-        BlockState onFallBlockState = new(StartBlockState.index, StartBlockState.axis, transform.localPosition, transform.rotation)
+        BlockState onFallBlockState = new(StartBlockState.index, StartBlockState.block, StartBlockState.axis)
         {
+            pos = transform.localPosition,
+            rotation = transform.localRotation,
             time = Time.time - startTime,
             angularVelocity = rigidBody.angularVelocity.magnitude,
             linearVelocity = rigidBody.linearVelocity.magnitude,
@@ -68,32 +70,31 @@ public class BlockObserver : MonoBehaviour
 
 public class BlockState : IEquatable<BlockState>
 {
-    public int index { get; }
-    public Axis axis { get; }
+    public readonly int index;  // identity
+    public readonly byte block; // identity (one bit is 1)
+    public readonly Axis axis;  // identity
     
-    public Vector3 pos { get; }
-    public Quaternion rotation { get; }
-    
-    public float time { get; set; }
-    public float linearVelocity { get; set; }
-    public float maxLinearVelocity { get; set; }
-    public float angularVelocity { get; set; }
-    public float maxAngularVelocity { get; set; }
-    public TestState testState { get; set; }
+    public Vector3 pos;
+    public Quaternion rotation;
+    public float time;
+    public float linearVelocity;
+    public float maxLinearVelocity;
+    public float angularVelocity;
+    public float maxAngularVelocity;
+    public TestState testState;
 
-    public BlockState( int index, Axis axis, Vector3 pos, Quaternion rotation)
+    public BlockState(int index, byte block, Axis axis)
     {
         this.index = index;
+        this.block = block;
         this.axis = axis;
-        this.pos = pos;
-        this.rotation = rotation;
     }
 
     public bool Equals(BlockState other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
-        return pos.Equals(other.pos) && rotation.Equals(other.rotation) && index == other.index && axis == other.axis;
+        return index == other.index && block == other.block && axis == other.axis;
     }
 
     public override bool Equals(object obj)
@@ -106,7 +107,7 @@ public class BlockState : IEquatable<BlockState>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(pos, rotation, index, axis);
+        return HashCode.Combine(index, block, axis);
     }
 }
 
