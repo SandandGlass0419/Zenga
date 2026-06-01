@@ -2,9 +2,9 @@ namespace Zenga;
 
 // lay1(decimal)/lay2/lay3/.../layn start_width start_height side
 
-public partial class ZengaStrings
+public static class ZengaStrings
 {
-    public static string BoardToString(Board board)
+    public static string ToString(Board board)
     {
         string[] fields = new string[3];
 
@@ -15,11 +15,8 @@ public partial class ZengaStrings
 
         return string.Join(' ', fields);
     }
-}
 
-public partial class ZengaStrings
-{
-    public static Board? StringToBoard(string strBoard)
+    public static Board? ToBoard(string strBoard)
     {
         var splitFields = strBoard.Split(' ');
 
