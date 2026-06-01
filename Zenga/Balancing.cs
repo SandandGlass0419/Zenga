@@ -2,30 +2,58 @@ namespace Zenga;
 
 public abstract class Balancing
 {
-    public decimal[] Balance { get; set; }
+    public Balance[] currentBalance { get; set; }
     
     public readonly int height;
     public readonly int width;
     
     public Balancing(int height, int width)
     {
-        Balance = new decimal[height * width];
+        currentBalance = new Balance[height * width];
         this.height = height;
         this.width = width;
     }
 
     public abstract void Reset();
-    public abstract Tuple<decimal, Axis> Calculate(Board board);
-    //public abstract decimal GetLegalMoves();
-    //public abstract decimal Update(Move move);
+    public abstract Balance Calculate(Board board);
+}
+
+public record struct Balance(decimal value, Axis axis)
+{
+    public static readonly Balance Default = new(0, Axis.NONE);
 }
 
 public class CoGBalancing : Balancing
 {
-    private readonly decimal endBlockCoG;
-    private decimal batchMass;
-    private decimal[] batchCoG = [0, 0];
+    public readonly decimal endBlockCoG;
+    public decimal batchMass;
+    public (decimal x, decimal z) batchCoG = (0, 0);
 
+    public decimal GetBatchCoG(Axis axis)
+    {
+        return axis == Axis.Z ? batchCoG.z : batchCoG.x;
+    }
+
+    public void SetBatchCoG(Axis axis, decimal value)
+    {
+        if (axis == Axis.Z)
+            batchCoG.z = value;
+        else
+            batchCoG.x = value;
+    }
+
+    public Balance MaxBalance
+    {
+        get;
+        set
+        {
+            if (Math.Abs(value.value) > Math.Abs(field.value) || value == Balance.Default)
+            {
+                field = value;
+            }
+        }
+    } = Balance.Default;
+    
     public CoGBalancing(int height, int width) : base(height, width)
     {
         this.endBlockCoG = (width - 1) / 2m;
@@ -33,42 +61,43 @@ public class CoGBalancing : Balancing
 
     public override void Reset()
     {
-        Balance = new decimal[height * width];
+        currentBalance = new Balance[height * width];
         batchMass = 0;
-        batchCoG = new decimal[] { 0, 0 };
+        batchCoG = (0, 0);
+        MaxBalance = Balance.Default;
     }
 
-    public override Tuple<decimal, Axis> Calculate(Board board)
+    public override Balance Calculate(Board board)
     {
-        Tuple<decimal, Axis> maxBal = new(0, Axis.NONE);
-        
         Axis axis = (Axis)(board.heightIndex % 2);
 
         UpdateBatchCoG(board.Tower[board.heightIndex], axis);
-        axis = axis.Cycle();
+        axis.Cycle();
         
         for (int i = board.heightIndex - 1; i >= 0; i--)
         {
-            decimal bal = GetBalance(board.Tower[i], axis);
-            Balance[i] = bal;
+            Balance bal = GetBalance(board.Tower[i], axis);
             
-            maxBal = Math.Abs(bal) > Math.Abs(maxBal.Item1) ? new(bal, axis) : maxBal;
+            currentBalance[i] = bal;
+            MaxBalance = bal;
             
             UpdateBatchCoG(board.Tower[i], axis);
 
-            axis = axis.Cycle();
+            axis.Cycle();
         }
 
-        return maxBal;
+        return MaxBalance;
     }
 
-    public decimal GetBalance(byte supportLayer, Axis axis)
+    public Balance GetBalance(byte supportLayer, Axis axis)
     {
         var range = GetSupportRange(supportLayer);
         decimal center = (range.Item1 + range.Item2) / 2;
         decimal rangeLen = (range.Item2 - range.Item1) / 2;
 
-        return (batchCoG[(int)axis] - center) / rangeLen;
+        decimal balanceValue = (GetBatchCoG(axis) - center) / rangeLen;
+
+        return new(balanceValue, axis);
     }
 
     public Tuple<decimal, decimal> GetSupportRange(byte supportLayer)
@@ -94,9 +123,11 @@ public class CoGBalancing : Balancing
 
     public void UpdateBatchCoG(byte layer, Axis axis)
     {
-        batchCoG[(int)axis] = BatchCoGFront(layer, axis);
+        SetBatchCoG(axis, BatchCoGFront(layer, axis));
+
+        axis.Cycle();
         
-        batchCoG[(int)axis.Cycle()] = BatchCoGSide(layer, axis.Cycle());
+        SetBatchCoG(axis, BatchCoGSide(layer, axis));
 
         batchMass += GetLayerMass(layer);
     }
@@ -106,14 +137,14 @@ public class CoGBalancing : Balancing
         decimal layerMass = GetLayerMass(layer);
         decimal layerCoG = GetLayerCoG(layer, layerMass);
 
-        return (batchCoG[(int)axis] * batchMass + layerCoG * layerMass) / (batchMass + layerMass);
+        return (GetBatchCoG(axis) * batchMass + layerCoG * layerMass) / (batchMass + layerMass);
     }
 
     public decimal BatchCoGSide(byte layer, Axis axis)
     {
         decimal layerMass = GetLayerMass(layer);
         
-        return (batchCoG[(int)axis] * batchMass) / (batchMass + layerMass); // layerCoG = 0
+        return (GetBatchCoG(axis) * batchMass) / (batchMass + layerMass); // layerCoG = 0
     }
 
     public decimal GetLayerMass(byte layer)

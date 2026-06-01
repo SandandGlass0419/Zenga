@@ -34,11 +34,23 @@ public class CoGTests
     public void UpdateCoGTest(byte layer, Axis axis, byte layer2)
     {
         balancing.UpdateBatchCoG(layer, axis);
-        
-        balancing.UpdateBatchCoG(layer2, axis.Cycle());
+        axis.Cycle();
+        balancing.UpdateBatchCoG(layer2, axis);
         
         Assert.Pass();
-    }   
+    }
+
+    [Test]
+    public void ResetTest()
+    {
+        balancing.MaxBalance = new(10, Axis.Z);
+        balancing.batchCoG = (100, -100);
+        balancing.batchMass = 10000;
+        
+        balancing.Reset();
+        
+        Assert.Pass();
+    }
     
     [TestCase(0b100, 0b011, 0b100)]
     public void BalanceTest(byte layer, byte layer1, byte layer2)
