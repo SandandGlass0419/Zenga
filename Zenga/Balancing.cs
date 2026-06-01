@@ -15,7 +15,7 @@ public abstract class Balancing
     }
 
     public abstract void Reset();
-    public abstract decimal Calculate(Board board);
+    public abstract Tuple<decimal, Axis> Calculate(Board board);
     //public abstract decimal GetLegalMoves();
     //public abstract decimal Update(Move move);
 }
@@ -38,9 +38,9 @@ public class CoGBalancing : Balancing
         batchCoG = new decimal[] { 0, 0 };
     }
 
-    public override decimal Calculate(Board board)
+    public override Tuple<decimal, Axis> Calculate(Board board)
     {
-        decimal maxBal = 0;
+        Tuple<decimal, Axis> maxBal = new(0, Axis.NONE);
         
         Axis axis = (Axis)(board.heightIndex % 2);
 
@@ -52,7 +52,7 @@ public class CoGBalancing : Balancing
             decimal bal = GetBalance(board.Tower[i], axis);
             Balance[i] = bal;
             
-            maxBal = Math.Abs(bal) > Math.Abs(maxBal) ? bal : maxBal;
+            maxBal = Math.Abs(bal) > Math.Abs(maxBal.Item1) ? new(bal, axis) : maxBal;
             
             UpdateBatchCoG(board.Tower[i], axis);
 

@@ -54,7 +54,7 @@ public class CoGTests
         Assert.Pass();
     }
 
-    [TestCase(new byte[] {2,2,2,2,2,2,2,2,2})]
+    [TestCase(new byte[] {5,5,7,7,7,7,7,7,7})]
     [TestCase(new byte[] {5, 6, 2, 5, 3, 3, 1, 0, 0})]
     [TestCase(new byte[] {0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0})]
     public void CalculateTest(byte[] tower)

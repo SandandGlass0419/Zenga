@@ -3,14 +3,12 @@ public static partial class ZengaStrings
 {
     public static string BoardToString(this Board board)
     {
-        string[] fields = new string[4];
+        string[] fields = new string[3];
 
         fields[0] = string.Join('/', board.Tower);
 
         fields[1] = board.Width.ToString();
         fields[2] = board.Height.ToString();
-
-        fields[3] = board.side.ToString();
 
         return string.Join(' ', fields);
     }
@@ -22,9 +20,7 @@ public static partial class ZengaStrings
     {
         var splitFields = strBoard.Split(' ');
 
-        if (splitFields.Length != 4) return null;
-
-        if (!ValidSide(splitFields[3])) return null;
+        if (splitFields.Length != 3) return null;
 
         if (!ValidDimention(splitFields[1], out int width)) return null;
         if (!ValidDimention(splitFields[2], out int height)) return null;
@@ -37,11 +33,6 @@ public static partial class ZengaStrings
         board.heightIndex = board.GetHeightIndex();
 
         return board;
-    }
-
-    private static bool ValidSide(string side)
-    {
-        return side == Side.W.ToString() || side == Side.B.ToString();
     }
 
     private static bool ValidDimention(string strDimSize, out int dimSize)

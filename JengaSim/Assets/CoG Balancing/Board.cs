@@ -21,9 +21,7 @@ public class Board
     public readonly int Width;
     public readonly int maxHeight;
 
-    public Side side;
-
-    public Board(int height = 18, int Width = 3, Side side = Side.W)
+    public Board(int height = 18, int Width = 3)
     {
         this.Height = height;
         this.Width = Width <= 8 ? Width : 8;
@@ -31,8 +29,6 @@ public class Board
         
         this.Tower = new byte[maxHeight];
         // heightIndex set on init; setter
-        
-        this.side = side;
     }
     
     public void InitPos()
@@ -217,7 +213,13 @@ public enum Axis
     Z = 1,
 }
 
-public static class AxisMethods
+public enum Side
+{
+    W = 0,
+    B = 1,
+}
+
+public static class EnumMethods
 {
     public static Axis Cycle(this Axis axis)
     {
@@ -231,10 +233,9 @@ public static class AxisMethods
                 return Axis.NONE;
         }
     }
-}
 
-public enum Side
-{
-    W = 0,
-    B = 1,
+    public static Side Cycle(this Side side)
+    {
+        return side == Side.W ? Side.B : Side.W;
+    }
 }
