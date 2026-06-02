@@ -21,13 +21,14 @@ public class CoGTests
         Assert.That(mass, Is.EqualTo(3m));
     }
 
-    [TestCase(0b101)]
-    public void GetCoGTest(byte layer)
+    [TestCase(0b101, 0)]
+    [TestCase(0b011, 0.5)]
+    public void GetCoGTest(byte layer, decimal cog)
     {
         balancing = new(18, 3);
         var CoG = balancing.GetLayerCoG(layer, balancing.GetLayerMass(layer));
         
-        Assert.That(CoG, Is.EqualTo(0));
+        Assert.That(CoG, Is.EqualTo(cog));
     }
 
     [TestCase(0b100, Axis.X, 0b011)]
@@ -68,7 +69,7 @@ public class CoGTests
 
     [TestCase(new byte[] {5,5,7,7,7,7,7,7,7})]
     [TestCase(new byte[] {5, 6, 2, 5, 3, 3, 1, 0, 0})]
-    [TestCase(new byte[] {0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0})]
+    [TestCase(new byte[] {0b101, 0b101, 0b101, 0b010, 0, 0, 0, 0, 0})]
     public void CalculateTest(byte[] tower)
     {
         Board testBoard = new(height: 3)

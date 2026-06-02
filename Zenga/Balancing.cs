@@ -47,7 +47,7 @@ public class CoGBalancing : Balancing
         get;
         set
         {
-            if (Math.Abs(value.value) > Math.Abs(field.value) || value == Balance.Default)
+            if (Math.Abs(value.value) >= Math.Abs(field.value) || value == Balance.Default)
             {
                 field = value;
             }

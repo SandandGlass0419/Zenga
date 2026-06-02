@@ -43,13 +43,13 @@ public class Board
     public void RemoveBlock(byte block, int index)
     {
         Tower[index].RefRemoveBlock(block);
-        UpdateHeightIndexRemoved(block);
+        UpdateHeightIndexRemoved(index);
     }
     
     public void PlaceBlock(byte block, int index)
     {
         Tower[index].RefPlaceBlock(block);
-        UpdateHeightIndexPlaced(block);
+        UpdateHeightIndexPlaced(index);
     }
 
     public void ApplyMove(Move move)

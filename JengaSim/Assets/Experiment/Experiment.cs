@@ -169,7 +169,7 @@ public partial class Experiment
     {
         foreach (var board in Import(depth))
         {
-            GenerateNext next = new(board);
+            LayerExpander next = new(board);
             next.ExpandPosition();
 
             foreach (var nextBoard in next.ExpandedOnce)

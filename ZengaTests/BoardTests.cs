@@ -10,7 +10,7 @@ public class BoardTests
     [Test]
     public void InitPos()
     {
-        Board board = new Board();
+        Board board = new();
         
         board.InitPos();
         
@@ -80,12 +80,12 @@ public class BoardTests
     {
         Board board = new(height: 3)
         {
-            Tower = [0, 1, 2, 1, 0, 0, 1, 1, 0]
+            Tower = [0, 1, 2, 1, 0, 0, 1, 0, 0]
         };
 
         int result = board.GetHeightIndex();
 
-        Assert.That(result, Is.EqualTo(7), $"got {result}");
+        Assert.That(result, Is.EqualTo(6), $"got {result}");
     }
 
     [Test]
@@ -149,7 +149,7 @@ public class BoardTests
         Board board = new();
         board.InitPos();
 
-        Move move = new((0b101, 3), (0, 18));
+        Move move = new((0b101, 3), (0b001, 18));
         board.ApplyMove(move);
         
         board.UndoMove(move);
