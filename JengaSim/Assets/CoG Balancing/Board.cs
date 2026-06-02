@@ -1,10 +1,10 @@
-using System.Runtime.CompilerServices;
+// modified version for unity
+
 using System.Collections.Generic;
 
 public class Board
 {
     private byte[] tower;
-    
     public byte[] Tower
     {
         get => tower;
@@ -24,16 +24,16 @@ public class Board
     public Board(int height = 18, int Width = 3)
     {
         this.Height = height;
-        this.Width = Width <= 8 ? Width : 8;
+        this.Width = Width; // <= 8 (byte)
         this.maxHeight = this.Width * this.Height;
         
         this.Tower = new byte[maxHeight];
-        // heightIndex set on init; setter
+        // heightIndex set on setter of Tower
     }
     
     public void InitPos()
     {
-        byte layer = (byte)((1 << Width) - 1);
+        byte layer = (byte)((1 << Width) - 1);  // this is ok since bitwise opperation defaults to int. (byte)(256 - 1)
         
         for (int i = 0; i < Height; i++)
         {
@@ -42,29 +42,23 @@ public class Board
 
         heightIndex = Height - 1;
     }
-
-    public void RemoveBlock(BlockMove block)
+    
+    public void RemoveBlock(byte block, int index)
     {
-        Tower[block.slotIndex] = block.RemoveFrom(Tower[block.slotIndex]);
-        UpdateHeightIndexRemoved(block);
+        Tower[index].RefRemoveBlock(block);
+        UpdateHeightIndexRemoved(index);
     }
-
-    public void PlaceBlock(BlockMove block)
+    
+    public void PlaceBlock(byte block, int index)
     {
-        Tower[block.slotIndex] = block.PlaceTo(Tower[block.slotIndex]);
-        UpdateHeightIndexPlaced(block);
-    }
-
-    public void ApplyMove(BlockMove removingBlock, BlockMove placingBlock)
-    {
-        RemoveBlock(removingBlock);
-
-        PlaceBlock(placingBlock);
+        Tower[index].RefPlaceBlock(block);
+        UpdateHeightIndexPlaced(index);
     }
 
     public void ApplyMove(Move move)
     {
-        ApplyMove(move.RemovingBlock, move.PlacingBlock);
+        RemoveBlock(move.removing.block, move.removing.index);
+        PlaceBlock(move.adding.block, move.adding.index);
     }
 
     public void ApplyMove(IEnumerable<Move> moves)
@@ -75,16 +69,10 @@ public class Board
         }
     }
 
-    public void UndoMove(BlockMove removingBlock, BlockMove placingBlock)
-    {
-         RemoveBlock(placingBlock);
-         
-         PlaceBlock(removingBlock);
-    }
-
     public void UndoMove(Move move)
     {
-        UndoMove(move.RemovingBlock, move.PlacingBlock);
+        RemoveBlock(move.adding.block, move.adding.index);
+        PlaceBlock(move.removing.block, move.removing.index);
     }
 
     public void UndoMove(IEnumerable<Move> moves)
@@ -93,28 +81,6 @@ public class Board
         {
             UndoMove(move);
         }
-    }
-
-    public bool ValidatePlace(BlockMove block)
-    {
-        return ValidatePlace(Tower[block.slotIndex], block.movingBlock);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool ValidatePlace(byte towerBlock, byte movingBlock)  // 1, 1 => false
-    {
-        return (towerBlock & movingBlock) == 0;
-    }
-
-    public bool ValidateRemove(BlockMove block)
-    {
-        return ValidateRemove(Tower[block.slotIndex], block.movingBlock);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool ValidateRemove(byte towerBlock, byte movingBlock) // 0, 1 => false
-    {
-        return (byte)(towerBlock & movingBlock) == movingBlock;
     }
 
     public int GetHeightIndex()
@@ -127,115 +93,86 @@ public class Board
         return 0;   // set default variable for maxHeight if -1 is correct
     }
 
-    public int UpdateHeightIndexPlaced(BlockMove block) // accounts the highest layer with at least 1 block.
+    public void UpdateHeightIndexPlaced(int index) // accounts the highest layer with at least 1 block.
     {
-        if (block.slotIndex > heightIndex && Tower[block.slotIndex] != 0)
+        if (index > heightIndex && Tower[index] != 0)
         {
-            heightIndex = block.slotIndex;
+            heightIndex = index;
         }
-        
-        return heightIndex;
     }
 
-    public int UpdateHeightIndexRemoved(BlockMove block)
+    public void UpdateHeightIndexRemoved(int index)
     {
-        if (block.slotIndex == heightIndex && Tower[block.slotIndex] == 0)
+        if (index == heightIndex && Tower[index] == 0)
         {
-            heightIndex -= block.slotIndex > 0 ? 1 : 0;
+            heightIndex -= index > 0 ? 1 : 0;   // don't decrease index if heightIndex = 0
         }
-
-        return heightIndex;
     }
-
-    // logic testing
-    // validate position (CoG)
-    // validate move (block already there?, placed in valid?) ok
 }
 
 public struct Move
 {
-    public BlockMove RemovingBlock { get; set; }
-    public BlockMove PlacingBlock { get; set; }
+    public (byte block, int index) removing;
+    public (byte block, int index) adding;
 
-    public Move(BlockMove RemovingBlock, BlockMove PlacingBlock)
+    public Move((byte, int) removing, (byte, int) adding)
     {
-        this.RemovingBlock = RemovingBlock;
-        this.PlacingBlock = PlacingBlock;
+        this.removing = removing;
+        this.adding = adding;
     }
+
+    public static readonly (byte, int) None = (0, 0);
 }
 
-public readonly struct BlockMove
+public static class BlockExt
 {
-    public readonly byte movingBlock;
-    public readonly int slotIndex;
-
-    public BlockMove(byte movingBlock, int slotIndex)
+    public static byte RemoveBlock(this byte layer, byte block)
     {
-        this.movingBlock = movingBlock;
-        this.slotIndex = slotIndex;
+        return (byte)(layer & ~block);
     }
 
-    public BlockMove(int blockIndex, int slotIndex) // 0-7, -1 = blank
+    public static void RefRemoveBlock(ref this byte layer, byte block)
     {
-        this.movingBlock = (byte)(1 << blockIndex);
-        this.slotIndex = slotIndex;
+        layer = (byte)(layer & ~block);
+    }
+    
+    public static byte PlaceBlock(this byte layer, byte block)
+    {
+        return (byte)(layer | block);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public byte PlaceTo(byte block)
+    public static void RefPlaceBlock(ref this byte layer, byte block)
     {
-        return (byte)(block | movingBlock);
+        layer = (byte)(layer | block);
     }
-
-    public byte PlaceTo(ref byte block)
+    
+    public static bool ValidateRemove(this byte towerBlock, byte movingBlock) // 0, 1 => false
     {
-        block = (byte)(block | movingBlock);
-        return block;
+        return (byte)(towerBlock & movingBlock) == movingBlock;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public byte RemoveFrom(byte block)
+    
+    public static bool ValidatePlace(this byte layer, byte block)  // 1, 1 => false
     {
-        return (byte)(block & ~movingBlock);
-    }
-
-    public byte RemoveFrom(ref byte block)
-    {
-        block = (byte)(block & ~movingBlock);
-        return block;
+        return (layer & block) == 0;
     }
 }
 
 public enum Axis
 {
-    NONE = -1,
-    X = 0,
-    Z = 1,
+    NONE = 0,
+    X = 1,
+    Z = 2,
 }
 
-public enum Side
-{
-    W = 0,
-    B = 1,
-}
-
-public static class EnumMethods
+public static class AxisMethods
 {
     public static Axis Cycle(this Axis axis)
     {
-        switch (axis)
-        {
-            case Axis.X:
-                return Axis.Z;
-            case Axis.Z:
-                return Axis.X;
-            default:
-                return Axis.NONE;
-        }
+        return axis == Axis.Z ? Axis.X : Axis.Z;
     }
-
-    public static Side Cycle(this Side side)
+    
+    public static void RefCycle(ref this Axis axis)
     {
-        return side == Side.W ? Side.B : Side.W;
+        axis = axis == Axis.Z ? Axis.X : Axis.Z;
     }
 }

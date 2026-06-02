@@ -1,34 +1,33 @@
-// lay1(decimal)/lay2/lay3/.../layn start_width start_height side
-public static partial class ZengaStrings
+// modified version for unity
+// lay1(decimal)/lay2/lay3/.../layn height width
+
+public static class ZengaStrings
 {
-    public static string BoardToString(this Board board)
+    public static string ToString(this Board board)
     {
         string[] fields = new string[3];
 
         fields[0] = string.Join('/', board.Tower);
 
-        fields[1] = board.Width.ToString();
-        fields[2] = board.Height.ToString();
+        fields[1] = board.Height.ToString();
+        fields[2] = board.Width.ToString();
 
         return string.Join(' ', fields);
     }
-}
 
-public static partial class ZengaStrings
-{
-    public static Board? StringToBoard(this string strBoard)
+    public static Board? ToBoard(this string strBoard)
     {
         var splitFields = strBoard.Split(' ');
 
         if (splitFields.Length != 3) return null;
-
-        if (!ValidDimention(splitFields[1], out int width)) return null;
-        if (!ValidDimention(splitFields[2], out int height)) return null;
+        
+        if (!ValidDimention(splitFields[1], out int height)) return null;
+        if (!ValidDimention(splitFields[2], out int width)) return null;
         
         Board board = new(height, width);
         
         var splitLayers = splitFields[0].Split('/');
-        if (!ValidLayers(splitLayers, ref board)) return null;
+        if (!ValidLayers(splitLayers, board)) return null;
 
         board.heightIndex = board.GetHeightIndex();
 
@@ -46,7 +45,7 @@ public static partial class ZengaStrings
         return true;
     }
 
-    private static bool ValidLayers(string[] strLayers, ref Board board)
+    private static bool ValidLayers(string[] strLayers, Board board)
     {
         byte maxBlock = (byte)((1 << board.Width) - 1);
 
