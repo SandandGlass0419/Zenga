@@ -51,7 +51,7 @@ public struct Balance : IEquatable<Balance>
 
 public class CoGBalancing : Balancing
 {
-    public readonly decimal endBlockCoG;
+    public decimal endBlockCoG;
     public decimal batchMass;
     public (decimal x, decimal z) batchCoG = (0, 0);
 

@@ -9,8 +9,8 @@ public static class ZengaStrings
 
         fields[0] = string.Join('/', board.Tower);
 
-        fields[1] = board.Height.ToString();
-        fields[2] = board.Width.ToString();
+        fields[1] = board.height.ToString();
+        fields[2] = board.width.ToString();
 
         return string.Join(' ', fields);
     }
@@ -47,7 +47,7 @@ public static class ZengaStrings
 
     private static bool ValidLayers(string[] strLayers, Board board)
     {
-        byte maxBlock = (byte)((1 << board.Width) - 1);
+        byte maxBlock = (byte)((1 << board.width) - 1);
 
         if (strLayers.Length > board.maxHeight) return false;
         

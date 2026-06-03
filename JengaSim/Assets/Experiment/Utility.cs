@@ -30,7 +30,7 @@ public class LayerExpander
             byte[] newTower = board.Tower.ToArray();    // deep copy
             newTower[layerIndex] = layer;
             
-            Board newBoard = new(board.Height, board.Width) { Tower = newTower };
+            Board newBoard = new(board.height, board.width) { Tower = newTower };
             
             newBoards.Add(newBoard);
         }
@@ -42,7 +42,7 @@ public class LayerExpander
     {
         List<byte> expanded = new();
         
-        for (int i = 0; i < motherBoard.Width; i++)
+        for (int i = 0; i < motherBoard.width; i++)
         {
             byte move = (byte)(1 << i);
             byte newLayer = layer.RemoveBlock(move);

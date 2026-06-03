@@ -243,7 +243,7 @@ GameObject:
   - component: {fileID: 394293432}
   - component: {fileID: 394293431}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: ExperimentManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -261,9 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c761e9b65820906c2ac6ed359c3a3a32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewEmptyCSharpScript
-  BlockPrefab: {fileID: 7920912939941682895, guid: 4a6dce70a50b2076a81a4dee4d064995, type: 3}
-  PlaneObject: {fileID: 329696277}
-  Tower: []
+  TowerBuilder: {fileID: 1062321552}
 --- !u!4 &394293432
 Transform:
   m_ObjectHideFlags: 0
@@ -468,6 +466,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1062321552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1062321553}
+  - component: {fileID: 1062321554}
+  m_Layer: 0
+  m_Name: TowerBuilder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1062321553
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062321552}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1062321554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062321552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40b00d222edf4d9b96e5b6bf33c04e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerBuilder
+  BlockPrefab: {fileID: 7920912939941682895, guid: 4a6dce70a50b2076a81a4dee4d064995, type: 3}
+  Tower: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -476,3 +520,4 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 329696282}
   - {fileID: 394293432}
+  - {fileID: 1062321553}

@@ -10,53 +10,59 @@ public class BlockObserver : MonoBehaviour
     private Rigidbody rigidBody;
     private float startTime;
 
-    public event EventHandler<MotionFinishedEventArgs> MotionFinishedEvent;
-    public bool finished = false;
+    public event EventHandler<MotionEventArgs> MotionFinishedEvent;
+    public bool sleeping = false;
 
     public void Initialize(BlockState startBlockState, List<BlockState> neighbors)
     {
         this.StartBlockState = startBlockState;
         this.Neighbors = neighbors;
         this.rigidBody = this.GetComponent<Rigidbody>();
-        this.startTime = Time.time;
+        this.startTime = Time.fixedTime;
+        //Debug.Log($"{Time.frameCount}");
     }
 
     public void FixedUpdate()
     {
-        if (finished) return;
-        if (Time.time - startTime < 0.04) return;
-        if (rigidBody.linearVelocity.magnitude != 0 || rigidBody.angularVelocity.magnitude != 0) return;
-        
-        OnFinish(TestState.PASS);
+        if (Time.fixedTime - startTime <= 0.04) return;
+
+        if (!sleeping && rigidBody.IsSleeping())
+        {
+            sleeping = true;
+            OnMotion(TestStates.SLEEP);
+        }
+        else if (sleeping && !rigidBody.IsSleeping())
+        {
+            sleeping = false;
+            OnMotion(TestStates.AWAKE);
+        }
     }
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (finished) return;
         if (StartBlockState.index <= 0) return; // excluding base blocks (index = 0)
          
         if (collision.gameObject.name == "Plane")
         {
-            OnFinish(TestState.PLANE);
+            OnMotion(TestStates.PLANE);
             return;
         }
 
-        var collisionAttribute = collision.gameObject.GetComponent<BlockObserver>().StartBlockState;
+        var collidingBlock = collision.gameObject.GetComponent<BlockObserver>().StartBlockState;
         
-        if (StartBlockState.index > collisionAttribute.index && !Neighbors.Contains(collisionAttribute))
+        if (StartBlockState.index > collidingBlock.index && !Neighbors.Contains(collidingBlock))
         {
-            OnFinish(TestState.BLOCK);
+            OnMotion(TestStates.BLOCK);
         }
     }
 
-    public void OnFinish(TestState state)
+    public void OnMotion(TestStates state)
     {
-        finished = true;
         BlockState onFallBlockState = new(StartBlockState.index, StartBlockState.block, StartBlockState.axis)
         {
             pos = transform.localPosition,
             rotation = transform.localRotation,
-            time = Time.time - startTime,
+            time = Time.fixedTime - startTime,
             angularVelocity = rigidBody.angularVelocity.magnitude,
             linearVelocity = rigidBody.linearVelocity.magnitude,
             maxAngularVelocity = rigidBody.maxAngularVelocity,
@@ -81,7 +87,7 @@ public class BlockState : IEquatable<BlockState>
     public float maxLinearVelocity;
     public float angularVelocity;
     public float maxAngularVelocity;
-    public TestState testState;
+    public TestStates testState;
 
     public BlockState(int index, byte block, Axis axis)
     {
@@ -111,39 +117,42 @@ public class BlockState : IEquatable<BlockState>
     }
 }
 
-public enum TestState
+public enum TestStates
 {
     RUNNING = 0,
     PLANE = 1,
     BLOCK = 2,
-    PASS = 3,
+    SLEEP = 3,
+    AWAKE = 4,
 }
 
 public static class TestStateExt
 {
-    public static string ToString(this TestState state)
+    public static string ToString(this TestStates state)
     {
         switch (state)
         {
-            case TestState.RUNNING:
+            case TestStates.RUNNING:
                 return "Running";
-            case TestState.PLANE:
+            case TestStates.PLANE:
                 return "Plane";
-            case TestState.BLOCK:
+            case TestStates.BLOCK:
                 return "Block";
-            case TestState.PASS:
-                return "Pass";
+            case TestStates.SLEEP:
+                return "Sleep";
+            case TestStates.AWAKE:
+                return "Awake";
             default:
                 return null;
         }
     }
 }
 
-public class MotionFinishedEventArgs : EventArgs
+public class MotionEventArgs : EventArgs
 {
     public BlockState BlockState { get; }
 
-    public MotionFinishedEventArgs(BlockState blockState)
+    public MotionEventArgs(BlockState blockState)
     {
         this.BlockState = blockState;
     }
