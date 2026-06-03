@@ -70,6 +70,7 @@ public class CoGTests
     [TestCase(new byte[] {5,5,7,7,7,7,7,7,7})]
     [TestCase(new byte[] {5, 6, 2, 5, 3, 3, 1, 0, 0})]
     [TestCase(new byte[] {0b101, 0b101, 0b101, 0b010, 0, 0, 0, 0, 0})]
+    [TestCase(new byte[] { 5, 6, 2, 5, 3, 3, 1, 2, 0 })]
     public void CalculateTest(byte[] tower)
     {
         Board testBoard = new(height: 3)

@@ -4,8 +4,8 @@ public abstract class Balancing
 {
     public Balance[] currentBalance { get; set; }
     
-    public readonly int height;
-    public readonly int width;
+    public int height;
+    public int width;
     
     public Balancing(int height, int width)
     {
@@ -25,7 +25,7 @@ public record struct Balance(decimal value, Axis axis)
 
 public class CoGBalancing : Balancing
 {
-    public readonly decimal endBlockCoG;
+    public decimal endBlockCoG;
     public decimal batchMass;
     public (decimal x, decimal z) batchCoG = (0, 0);
 

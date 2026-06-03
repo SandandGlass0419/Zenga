@@ -14,15 +14,15 @@ public class Board
 
     public int heightIndex;
     
-    public readonly int Height;
-    public readonly int Width;
-    public readonly int maxHeight;
+    public int height;
+    public int width;
+    public int maxHeight;
 
     public Board(int height = 18, int Width = 3)
     {
-        this.Height = height;
-        this.Width = Width; // <= 8 (byte)
-        this.maxHeight = this.Width * this.Height;
+        this.height = height;
+        this.width = Width; // <= 8 (byte)
+        this.maxHeight = this.width * this.height;
         
         this.Tower = new byte[maxHeight];
         // heightIndex set on setter of Tower
@@ -30,14 +30,14 @@ public class Board
     
     public void InitPos()
     {
-        byte layer = (byte)((1 << Width) - 1);  // this is ok since bitwise opperation defaults to int. (byte)(256 - 1)
+        byte layer = (byte)((1 << width) - 1);  // this is ok since bitwise opperation defaults to int. (byte)(256 - 1)
         
-        for (int i = 0; i < Height; i++)
+        for (int i = 0; i < height; i++)
         {
             Tower[i] = layer;
         }
 
-        heightIndex = Height - 1;
+        heightIndex = height - 1;
     }
     
     public void RemoveBlock(byte block, int index)
