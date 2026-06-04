@@ -1,101 +1,111 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Balancing;
 using UnityEngine;
 
-public class ExperimentManager : MonoBehaviour
+namespace Experiment
 {
-    public GameObject TowerBuilder;
+    public class ExperimentManager : MonoBehaviour
+    {
+        public GameObject TowerBuilder;
     
-    public async void Awake()
-    {
-        Experiment Experiment = new(TowerBuilder.GetComponent<TowerBuilder>(), 3, 3);
-        
-        Time.timeScale = 20f;
-
-        Board exp1 = new(height: 3) { Tower = new byte[] { 5, 6, 2, 5, 3, 3, 1, 2, 0 } };
-        Board exp2 = new(height: 3) { Tower = new byte[] { 2, 2, 2, 2, 2, 2, 2, 2, 2 } };
-        Board exp3 = new(height: 3) { Tower = new byte[] { 5, 5, 7, 7, 5, 5, 5, 7, 7 } };
-
-        await AverageExperiment(exp2, 4);
-    }
-
-    public async Awaitable AverageExperiment(Board board, int times)
-    {
-        Experiment experiment = new(TowerBuilder.GetComponent<TowerBuilder>(), 3, 3);
-
-        for (int i = 0; i < times; i++)
+        public async void Awake()
         {
-            await experiment.RunNewAsync(board);
-        }
-
-        Debug.Log($"Avg: {experiment.cogResults[0].value}, {experiment.unityResults.Average(state => state.time)}");
-    }
-}
-
-public class Experiment
-{
-    public CoGBalancing Balancer { get; set; }
-    public TowerBuilder Builder { get; set; }
-    
-    public bool Finished = false;
-    public int Progress = 0;
-    private TaskCompletionSource<BlockState> tcs = new();
-
-    public List<Balance> cogResults = new();
-    public List<BlockState> unityResults = new();
-    
-    public Experiment(TowerBuilder builder, int height, int width)
-    {
-        this.Balancer = new(height, width);
-        this.Builder = builder;
+            Experiment Experiment = new(TowerBuilder.GetComponent<TowerBuilder>(), 3, 3);
         
-        Builder.Initialize(width);
-    }
+            Time.timeScale = 20f;
 
-    public async Awaitable RunNewAsync(Board board)
-    {
-        cogResults.Add(Balancer.Calculate(board));
-        
-        Builder.PlaceTower(board, Motion);
-        unityResults.Add(await tcs.Task);
-        
-        ResetExperiment();
+            Board exp1 = new(height: 3) { Tower = new byte[] { 5, 6, 2, 5, 3, 3, 1, 2, 0 } };
+            Board exp2 = new(height: 3) { Tower = new byte[] { 2, 2, 2, 2, 2, 2, 2, 2, 2 } };
+            Board exp3 = new(height: 3) { Tower = new byte[] { 5, 5, 7, 7, 5, 5, 5, 7, 7 } };
 
-        await Awaitable.FixedUpdateAsync();
-    }
-    
-    public void Motion(object sender, MotionEventArgs e)
-    {
-        if (Finished) return;
+            await Experiment.RunNewAverageAsync(exp1, 4);
+            await Experiment.RunNewAverageAsync(exp2, 4);
+            await Experiment.RunNewAverageAsync(exp3, 4);
         
-        if (e.BlockState.testState == TestStates.SLEEP)
-        {
-            Progress++;
-            Finished = Progress >= Builder.Tower.Count;
-        }
-        else if (e.BlockState.testState == TestStates.AWAKE)
-        {
-            Progress--;
-        }
-        else
-        {
-            Finished = true;
-        }
-
-        if (Finished)
-        {
-            tcs.SetResult(e.BlockState);
+            await Experiment.RunNewAverageAsync(exp1, 4);
+            await Experiment.RunNewAverageAsync(exp2, 4);
+            await Experiment.RunNewAverageAsync(exp3, 4);
         }
     }
-    
-    public void ResetExperiment()
+
+    public class Experiment
     {
-        Balancer.Reset();
-        Builder.DestroyTower();
+        public CoGBalancing Balancer { get; set; }
+        public TowerBuilder Builder { get; set; }
+    
+        public bool Finished = false;
+        public int Progress = 0;
+        private TaskCompletionSource<BlockState> tcs = new();
+    
+        public Experiment(TowerBuilder builder, int height, int width)
+        {
+            this.Balancer = new(height, width);
+            this.Builder = builder;
         
-        tcs = new();
-        Finished = false;
-        Progress = 0;
+            Builder.Initialize(width);
+        }
+
+        public async Awaitable<(Balance, BlockState)> RunNewAsync(Board board)
+        {
+            (Balance, BlockState) result;
+        
+            result.Item1 = Balancer.Calculate(board);
+        
+            Builder.PlaceTower(board, MotionEventHandler);
+            result.Item2 = await tcs.Task;
+        
+            ResetExperiment();
+            await Awaitable.FixedUpdateAsync();
+
+            return result;
+        }
+    
+        public async Awaitable<(Balance, BlockState)> RunNewAverageAsync(Board board, int times)
+        {
+            (Balance, BlockState)[] results = new (Balance, BlockState)[times];
+        
+            for (int i = 0; i < times; i++)
+            {
+                results[i] = await RunNewAsync(board);
+            }
+
+            var balance = results.First().Item1;
+            var blockstate = BlockState.Average(results.Select(r => r.Item2).ToArray());
+        
+            return (balance, blockstate);
+        }
+    
+        public void MotionEventHandler(object sender, MotionEventArgs e)
+        {
+            if (Finished) return;
+        
+            if (e.BlockState.testState == TestStates.SLEEP)
+            {
+                Progress++;
+                Finished = Progress >= Builder.Tower.Count;
+            }
+            else if (e.BlockState.testState == TestStates.AWAKE)
+            {
+                Progress--;
+            }
+        
+            else Finished = true;
+
+            if (Finished)
+            {
+                tcs.SetResult(e.BlockState);
+            }
+        }
+    
+        public void ResetExperiment()
+        {
+            Balancer.Reset();
+            Builder.DestroyTower();
+        
+            tcs = new();
+            Finished = false;
+            Progress = 0;
+        }
     }
 }
