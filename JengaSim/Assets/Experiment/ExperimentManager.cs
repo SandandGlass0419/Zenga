@@ -18,14 +18,6 @@ namespace Experiment
             Board exp1 = new(height: 3) { Tower = new byte[] { 5, 6, 2, 5, 3, 3, 1, 2, 0 } };
             Board exp2 = new(height: 3) { Tower = new byte[] { 2, 2, 2, 2, 2, 2, 2, 2, 2 } };
             Board exp3 = new(height: 3) { Tower = new byte[] { 5, 5, 7, 7, 5, 5, 5, 7, 7 } };
-
-            await Experiment.RunNewAverageAsync(exp1, 4);
-            await Experiment.RunNewAverageAsync(exp2, 4);
-            await Experiment.RunNewAverageAsync(exp3, 4);
-        
-            await Experiment.RunNewAverageAsync(exp1, 4);
-            await Experiment.RunNewAverageAsync(exp2, 4);
-            await Experiment.RunNewAverageAsync(exp3, 4);
         }
     }
 
@@ -52,12 +44,12 @@ namespace Experiment
         
             result.Item1 = Balancer.Calculate(board);
         
-            Builder.PlaceTower(board, MotionEventHandler);
+            Builder.PlaceTower(board, ActionEventHandler);
             result.Item2 = await tcs.Task;
         
             ResetExperiment();
             await Awaitable.FixedUpdateAsync();
-
+            
             return result;
         }
     
@@ -72,11 +64,11 @@ namespace Experiment
 
             var balance = results.First().Item1;
             var blockstate = BlockState.Average(results.Select(r => r.Item2).ToArray());
-        
+            
             return (balance, blockstate);
         }
     
-        public void MotionEventHandler(object sender, MotionEventArgs e)
+        public void ActionEventHandler(object sender, ActionEventArgs e)
         {
             if (Finished) return;
         

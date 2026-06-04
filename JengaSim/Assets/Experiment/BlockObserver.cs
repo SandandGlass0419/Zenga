@@ -14,7 +14,7 @@ namespace Experiment
         private Rigidbody rigidBody;
         private float startFixedTime;
 
-        public event EventHandler<MotionEventArgs> MotionFinishedEvent;
+        public event EventHandler<ActionEventArgs> MotionFinishedEvent;
         public bool sleeping = false;
 
         public void Initialize(BlockState startBlockState, List<BlockState> neighbors)
@@ -32,12 +32,12 @@ namespace Experiment
             if (!sleeping && rigidBody.IsSleeping())
             {
                 sleeping = true;
-                OnMotion(TestStates.SLEEP);
+                OnAction(TestStates.SLEEP);
             }
             else if (sleeping && !rigidBody.IsSleeping())
             {
                 sleeping = false;
-                OnMotion(TestStates.AWAKE);
+                OnAction(TestStates.AWAKE);
             }
         }
 
@@ -47,7 +47,7 @@ namespace Experiment
          
             if (collision.gameObject.name == "Plane")
             {
-                OnMotion(TestStates.PLANE);
+                OnAction(TestStates.PLANE);
                 return;
             }
 
@@ -55,11 +55,11 @@ namespace Experiment
         
             if (StartBlockState.index > collidingBlock.index && !Neighbors.Contains(collidingBlock))
             {
-                OnMotion(TestStates.BLOCK);
+                OnAction(TestStates.BLOCK);
             }
         }
 
-        public void OnMotion(TestStates state)
+        public void OnAction(TestStates state)
         {
             BlockState onFallBlockState = new(StartBlockState.index, StartBlockState.block, StartBlockState.axis)
             {
@@ -169,11 +169,11 @@ namespace Experiment
         }
     }
 
-    public class MotionEventArgs : EventArgs
+    public class ActionEventArgs : EventArgs
     {
         public BlockState BlockState { get; }
 
-        public MotionEventArgs(BlockState blockState)
+        public ActionEventArgs(BlockState blockState)
         {
             this.BlockState = blockState;
         }

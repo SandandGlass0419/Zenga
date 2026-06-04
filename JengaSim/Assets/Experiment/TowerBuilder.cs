@@ -17,7 +17,7 @@ namespace Experiment
             this.Tower = new();
         }
     
-        public void PlaceLayer(byte layer, int index, Axis axis, EventHandler<MotionEventArgs> OnFinished)
+        public void PlaceLayer(byte layer, int index, Axis axis, EventHandler<ActionEventArgs> OnFinished)
         {
             foreach (var blockAttribute in BlockStateBuilder.BuildLayerBlockState(layer, index, axis))
             {
@@ -25,7 +25,7 @@ namespace Experiment
             }
         }
     
-        public void PlaceBlock(BlockState block, EventHandler<MotionEventArgs> OnFinished)
+        public void PlaceBlock(BlockState block, EventHandler<ActionEventArgs> OnFinished)
         {
             var instBlock = Instantiate(BlockPrefab, block.pos, block.rotation);
             instBlock.GetComponent<BlockObserver>().Initialize(block, BlockStateBuilder.BuildNeighborBlocks(block));
@@ -34,7 +34,7 @@ namespace Experiment
             Tower.Add(instBlock);
         }
 
-        public void PlaceTower(Board board, EventHandler<MotionEventArgs> OnFinished)
+        public void PlaceTower(Board board, EventHandler<ActionEventArgs> OnFinished)
         {
             Axis axis = Axis.X;
         
