@@ -9,7 +9,8 @@ namespace Experiment
     {
         public GameObject BlockPrefab;
         public BlockStateBuilder BlockStateBuilder;
-        public List<GameObject> Tower;
+        
+        public List<GameObject> Tower { get; set; }
 
         public void Initialize(int width)
         {
@@ -17,6 +18,17 @@ namespace Experiment
             this.Tower = new();
         }
     
+        public void PlaceTower(Board board, EventHandler<ActionEventArgs> OnFinished)
+        {
+            Axis axis = Axis.X;
+        
+            for (int i = 0; i < board.Tower.Length; i++)
+            {
+                PlaceLayer(board.Tower[i], i, axis, OnFinished);
+                axis = axis.Cycle();
+            }
+        }
+        
         public void PlaceLayer(byte layer, int index, Axis axis, EventHandler<ActionEventArgs> OnFinished)
         {
             foreach (var blockAttribute in BlockStateBuilder.BuildLayerBlockState(layer, index, axis))
@@ -32,17 +44,6 @@ namespace Experiment
             instBlock.GetComponent<BlockObserver>().MotionFinishedEvent += OnFinished;
 
             Tower.Add(instBlock);
-        }
-
-        public void PlaceTower(Board board, EventHandler<ActionEventArgs> OnFinished)
-        {
-            Axis axis = Axis.X;
-        
-            for (int i = 0; i < board.Tower.Length; i++)
-            {
-                PlaceLayer(board.Tower[i], i, axis, OnFinished);
-                axis = axis.Cycle();
-            }
         }
 
         public void DestroyTower()

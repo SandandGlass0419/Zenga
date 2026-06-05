@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Balancing;
 using UnityEngine;
 
@@ -97,24 +96,6 @@ namespace Experiment
             this.index = index;
             this.block = block;
             this.axis = axis;
-        }
-
-        public static BlockState Average(BlockState[] blockStates)
-        {
-            BlockState first = blockStates.First();
-            BlockState newState = new(first.index, first.block, first.axis)
-            {
-                pos = first.pos,
-                rotation = first.rotation,
-                fixedTime = blockStates.Average(s => s.fixedTime),
-                linearVelocity = blockStates.Average(s => s.linearVelocity),
-                maxLinearVelocity = blockStates.Max(s => s.maxLinearVelocity),
-                angularVelocity = blockStates.Average(s => s.angularVelocity),
-                maxAngularVelocity = blockStates.Max(s => s.maxAngularVelocity),
-                testState = first.testState
-            };
-
-            return newState;
         }
     
         public bool Equals(BlockState other)
