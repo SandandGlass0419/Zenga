@@ -16,11 +16,22 @@ namespace Experiment
             Board exp3 = new(height: 3) { Tower = new byte[] { 5, 5, 7, 7, 5, 5, 5, 7, 7 } };
 
             Time.timeScale = 10f;
-            
-            await Experiment(exp1);
-            await Experiment(exp3);
-            await Experiment(exp1);
-            await Experiment(exp3);
+
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
+            await Experiment(exp2);
             await Experiment(exp2);
             await Experiment(exp2);
         }
