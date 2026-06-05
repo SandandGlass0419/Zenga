@@ -14,9 +14,12 @@ namespace Experiment
         
         public async void Awake()
         {
-            Time.timeScale = 30f;
+            Time.timeScale = 100f;
 
-            await SearchNext(1);
+            for (int d = 0; d < 36; d++)
+            {
+                await SearchNext(d);
+            }
         }
 
         public async Awaitable<(Balance, BlockState)> Measure(Board board)

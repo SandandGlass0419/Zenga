@@ -98,7 +98,7 @@ namespace Experiment
             int count = 0;
             int sector = 0;
             string measurementFileName = CreateMeasurementFile(depth, sector, fallen);
-            string depthmapFileName = CreateDepthMapFile(depth, sector, fallen);
+            //string depthmapFileName = CreateDepthMapFile(depth, sector, fallen);
 
             var buffer = fallen ? FallenBuffer : SurvivedBuffer;
             
@@ -109,11 +109,11 @@ namespace Experiment
                     count = 0;
                     sector++;
                     measurementFileName = CreateMeasurementFile(depth, sector, fallen);
-                    depthmapFileName = CreateDepthMapFile(depth, sector, fallen);
+                    //depthmapFileName = CreateDepthMapFile(depth, sector, fallen);
                 }
                 
                 File.AppendAllText(SearchDir + measurementFileName, $"{key},{string.Join(',', buffer[key].measurement)}" + '\n');
-                File.AppendAllText(SearchDir + depthmapFileName, $"{key},{string.Join(',', buffer[key].mother)}" + '\n');
+                //File.AppendAllText(SearchDir + depthmapFileName, $"{key},{string.Join(',', buffer[key].mother)}" + '\n');
                 
                 count++;
             }
@@ -129,7 +129,7 @@ namespace Experiment
             
             if (buffer.ContainsKey(key))
             {
-                buffer[key].mother.Add(motherBoard.BoardToString());
+                //buffer[key].mother.Add(motherBoard.BoardToString());
                 return;
             }
             
@@ -145,8 +145,9 @@ namespace Experiment
                 result.Item2.maxLinearVelocity.ToString()
             };
 
-            List<string> mother = new List<string>() { motherBoard.BoardToString() };
-        
+            //List<string> mother = new List<string>() { motherBoard.BoardToString() };
+            List<string> mother = new();
+            
             buffer.Add(key, (measurement, mother));
         }
         
