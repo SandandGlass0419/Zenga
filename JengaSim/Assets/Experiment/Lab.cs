@@ -20,9 +20,10 @@ namespace Experiment
             int d = 0;
             try
             {
-                for (d = 0; d < 36; d++)
+                for (d = 0; d < 24; d++)
                 {
                     await SearchNext(d);
+                    Console.WriteLine($"Finished {d} at {DateTime.Now}");
                 }
             }
             catch (Exception e)

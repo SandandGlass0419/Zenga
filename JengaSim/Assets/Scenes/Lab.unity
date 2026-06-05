@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 1224058537}
   - component: {fileID: 1224058538}
   m_Layer: 0
-  m_Name: LabManager
+  m_Name: Lab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
