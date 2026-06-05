@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Balancing;
 using UnityEngine;
@@ -16,10 +17,20 @@ namespace Experiment
         {
             Time.timeScale = 100f;
 
-            for (int d = 0; d < 36; d++)
+            int d = 0;
+            try
             {
-                await SearchNext(d);
+                for (d = 0; d < 36; d++)
+                {
+                    await SearchNext(d);
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e}, at depth: {d}");
+            }
+
+            Console.ReadKey();
         }
 
         public async Awaitable<(Balance, BlockState)> Measure(Board board)
