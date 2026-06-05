@@ -8,7 +8,7 @@ namespace Experiment
     {
         public GameObject TowerBuilderObject;
 
-        public int height { get; set; } = 3;
+        public int height { get; set; } = 6;
         public int width { get; set; } = 3;
         
         public CoGBalancing Balancer { get; set; }
@@ -35,8 +35,6 @@ namespace Experiment
             result.Item2 = await tcs.Task;
             
             ResetExperiment();
-
-            Debug.Log($"{result.Item2.fixedTime}");
 
             return result;
         }

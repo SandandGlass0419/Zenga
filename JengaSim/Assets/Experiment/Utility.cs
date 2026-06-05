@@ -6,12 +6,12 @@ using Balancing;
 
 namespace Experiment
 {
-    public class LayerExpander
+    public class BoardExpander
     {
         public List<Board> ExpandedOnce = new();
         public Board motherBoard;
 
-        public LayerExpander(Board board)
+        public BoardExpander(Board board)
         {
             this.motherBoard = board;
         }
@@ -60,43 +60,122 @@ namespace Experiment
         }
     }
 
-    public class FileJuggler
+    public class FileHelper
     {
-        Dictionary<string, string> Buffer = new();
+        public Dictionary<string, (string[] measurement, List<string> mother)> FallenBuffer = new();
+        public Dictionary<string, (string[] measurement, List<string> mother)> SurvivedBuffer = new();
     
-        public void FlushBuffer(string path)
-        {
-            File.AppendAllText(path, String.Empty);
+        public const string SearchDir = "/home/cinnamon/Projects/Zenga/DepthSearch/";    // will be set soon
+
+        public static string GetMeasurementFilePath(int depth, int sector, bool fallen) => fallen
+            ? $"d{depth}_fall/measurement_{sector}.csv"
+            : $"d{depth}_survive/measurement_{sector}.csv";
         
-            foreach (var keys in Buffer.Keys)
+        public string CreateMeasurementFile(int depth, int sector, bool fallen)
+        {
+            string name = GetMeasurementFilePath(depth, sector, fallen);
+            Directory.CreateDirectory(Path.GetDirectoryName(SearchDir + name) ?? "");
+            File.WriteAllText(SearchDir + name, String.Empty);
+
+            return name;
+        }
+
+        public static string GetDepthMapFilePath(int depth, int sector, bool fallen) => fallen
+            ? $"d{depth}_fall/depthmap_{sector}.csv"
+            : $"d{depth}_survive/depthmap_{sector}.csv";
+        
+        public string CreateDepthMapFile(int depth, int sector, bool fallen)
+        {
+            string name = GetDepthMapFilePath(depth, sector, fallen);
+            Directory.CreateDirectory(Path.GetDirectoryName(SearchDir + name) ?? "");
+            File.WriteAllText(SearchDir + name, String.Empty);
+
+            return name;
+        }
+        
+        public void FlushBuffer(int depth, bool fallen)
+        {
+            int count = 0;
+            int sector = 0;
+            string measurementFileName = CreateMeasurementFile(depth, sector, fallen);
+            string depthmapFileName = CreateDepthMapFile(depth, sector, fallen);
+
+            var buffer = fallen ? FallenBuffer : SurvivedBuffer;
+            
+            foreach (var key in buffer.Keys)
             {
-                File.AppendAllText(path, Buffer[keys] + '\n');
+                if (count >= 10000)
+                {
+                    count = 0;
+                    sector++;
+                    measurementFileName = CreateMeasurementFile(depth, sector, fallen);
+                    depthmapFileName = CreateDepthMapFile(depth, sector, fallen);
+                }
+                
+                File.AppendAllText(SearchDir + measurementFileName, $"{key},{string.Join(',', buffer[key].measurement)}" + '\n');
+                File.AppendAllText(SearchDir + depthmapFileName, $"{key},{string.Join(',', buffer[key].mother)}" + '\n');
+                
+                count++;
             }
 
-            Buffer.Clear();
+            buffer.Clear();
         }
 
-        public void UpdateBuffer(Board board, BlockState state, Balance balance)
+        public void UpdateBuffer(Board board, (Balance, BlockState) result, Board motherBoard)
         {
-            string key = board.ToString();
-            string value = $"{key},{balance.value},{balance.axis},{state.fixedTime},{state.linearVelocity},{state.maxLinearVelocity},{state.angularVelocity},{state.maxAngularVelocity}";
+            string key = board.BoardToString();
 
-            if (Buffer.ContainsKey(key)) return;
+            var buffer = result.Item2.testState != TestStates.SLEEP ? FallenBuffer : SurvivedBuffer;
+            
+            if (buffer.ContainsKey(key))
+            {
+                buffer[key].mother.Add(motherBoard.BoardToString());
+                return;
+            }
+            
+            string[] measurement =
+            new[] {
+                result.Item1.axis.ToString(),
+                result.Item1.value.ToString(),
+                result.Item2.fixedTime.ToString(),
+                result.Item2.testState.ToString(),
+                result.Item2.angularVelocity.ToString(),
+                result.Item2.maxAngularVelocity.ToString(),
+                result.Item2.linearVelocity.ToString(),
+                result.Item2.maxLinearVelocity.ToString()
+            };
+
+            List<string> mother = new List<string>() { motherBoard.BoardToString() };
         
-            Buffer.Add(key, value);
+            buffer.Add(key, (measurement, mother));
         }
-
-        public static List<Board> Import(string path)
+        
+        public List<Board> Import(int depth, int sector, bool fallen)    // imports measurements
         {
+            if (!File.Exists(SearchDir + GetMeasurementFilePath(depth, sector, fallen))) return new();
+            
             List<Board> boards = new();
-            string[] file = File.ReadAllLines(path);
+            string[] file = File.ReadAllLines(SearchDir + GetMeasurementFilePath(depth, sector, fallen));
 
             foreach (var entry in file)
             {
-                boards.Add(entry.Split(',').First().ToBoard());
+                boards.Add(entry.Split(',').First().StringToBoard());
             }
 
             return boards;
+        }
+
+        public int GetSectorCount(int depth, bool fallen)
+        {
+            int count = 0;
+            
+            while (true)
+            {
+                if (!File.Exists(SearchDir + GetMeasurementFilePath(depth, count, fallen))) 
+                    return count == 0 ? 0 : count;
+                
+                count++;
+            }
         }
     }
 }

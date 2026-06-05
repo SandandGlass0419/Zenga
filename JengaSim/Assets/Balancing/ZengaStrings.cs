@@ -1,12 +1,11 @@
 // modified version for unity
 // lay1(decimal)/lay2/lay3/.../layn height width
-#nullable enable
 
 namespace Balancing
 {
     public static class ZengaStrings
     {
-        public static string ToString(this Board board)
+        public static string BoardToString(this Board board)
         {
             string[] fields = new string[3];
 
@@ -18,19 +17,19 @@ namespace Balancing
             return string.Join(' ', fields);
         }
 
-        public static Board? ToBoard(this string strBoard)
+        public static Board StringToBoard(this string strBoard)
         {
             var splitFields = strBoard.Split(' ');
 
-            if (splitFields.Length != 3) return null;
+            if (splitFields.Length != 3) return new();
         
-            if (!ValidDimention(splitFields[1], out int height)) return null;
-            if (!ValidDimention(splitFields[2], out int width)) return null;
+            if (!ValidDimention(splitFields[1], out int height)) return new();
+            if (!ValidDimention(splitFields[2], out int width)) return new();
         
             Board board = new(height, width);
         
             var splitLayers = splitFields[0].Split('/');
-            if (!ValidLayers(splitLayers, board)) return null;
+            if (!ValidLayers(splitLayers, board)) return new();
 
             board.heightIndex = board.GetHeightIndex();
 

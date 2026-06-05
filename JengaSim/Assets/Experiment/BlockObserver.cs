@@ -15,6 +15,7 @@ namespace Experiment
 
         public event EventHandler<ActionEventArgs> MotionFinishedEvent;
         public bool sleeping = false;
+        public const float maxTime = 300f;
 
         public void Initialize(BlockState startBlockState, List<BlockState> neighbors)
         {
@@ -28,6 +29,11 @@ namespace Experiment
         {
             if (Time.fixedTime - startFixedTime <= 0.04) return;
 
+            if (Time.fixedTime - startFixedTime > maxTime)
+            {
+                OnAction(TestStates.TIMEOUT);
+            }
+            
             if (!sleeping && rigidBody.IsSleeping())
             {
                 sleeping = true;
@@ -126,6 +132,7 @@ namespace Experiment
         BLOCK = 2,
         SLEEP = 3,
         AWAKE = 4,
+        TIMEOUT = 5,
     }
 
     public static class TestStateExt
@@ -144,6 +151,8 @@ namespace Experiment
                     return "Sleep";
                 case TestStates.AWAKE:
                     return "Awake";
+                case TestStates.TIMEOUT:
+                    return "Timeout";
                 default:
                     return null;
             }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Balancing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,39 +9,49 @@ namespace Experiment
     {
         public const string ExperimentDir = "Scenes/";
         public const string ExperimentName = "Experiment";
+
+        public FileHelper fileHelper = new();
         
         public async void Awake()
         {
-            Board exp1 = new(height: 3) { Tower = new byte[] { 5, 6, 2, 5, 3, 3, 1, 2, 0 } };
-            Board exp2 = new(height: 3) { Tower = new byte[] { 2, 2, 2, 2, 2, 2, 2, 2, 2 } };
-            Board exp3 = new(height: 3) { Tower = new byte[] { 5, 5, 7, 7, 5, 5, 5, 7, 7 } };
+            Time.timeScale = 30f;
 
-            Time.timeScale = 10f;
-
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
-            await Experiment(exp2);
+            await SearchNext(1);
         }
 
-        public async Awaitable Experiment(Board board)
+        public async Awaitable<(Balance, BlockState)> Measure(Board board)
         {
             await SceneManager.LoadSceneAsync(ExperimentDir + ExperimentName, LoadSceneMode.Additive);
-            await FindFirstObjectByType<Experiment>().RunAsync(board);
+            var measurement = await FindFirstObjectByType<Experiment>().RunAsync(board);
             await SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(ExperimentName));
+
+            return measurement;
+        }
+
+        public async Awaitable SearchNext(int depth)
+        {
+            for (int sector = 0; sector < fileHelper.GetSectorCount(depth, false); sector++)
+            {
+                await SearchSector(depth, sector);
+            }
+            
+            fileHelper.FlushBuffer(depth + 1, true);
+            fileHelper.FlushBuffer(depth + 1, false);
+        }
+
+        public async Awaitable SearchSector(int depth, int sector)
+        {
+            List<Board> mother = fileHelper.Import(depth, sector, false);
+            foreach (var board in mother)
+            {
+                BoardExpander expander = new(board);
+                expander.ExpandPosition();
+
+                foreach (var newBoard in expander.ExpandedOnce)
+                {
+                    fileHelper.UpdateBuffer(newBoard, await Measure(newBoard), expander.motherBoard);
+                }
+            }
         }
     }
 }
