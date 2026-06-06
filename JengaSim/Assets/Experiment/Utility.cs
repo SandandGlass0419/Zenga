@@ -139,6 +139,7 @@ namespace Experiment
                 result.Item1.value.ToString(),
                 result.Item2.fixedTime.ToString(),
                 result.Item2.testState.ToString(),
+                result.Item2.axis.Cycle().ToString(),   // cycle to represent rotation direction
                 result.Item2.angularVelocity.ToString(),
                 result.Item2.maxAngularVelocity.ToString(),
                 result.Item2.linearVelocity.ToString(),
