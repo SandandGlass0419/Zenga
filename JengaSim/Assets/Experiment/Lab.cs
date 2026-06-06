@@ -17,18 +17,12 @@ namespace Experiment
         {
             Time.timeScale = 100f;
 
-            int d = 0;
-            try
-            {
-                for (d = 0; d < 24; d++)
-                {
-                    await SearchNext(d);
-                    Console.WriteLine($"Finished {d} at {DateTime.Now}");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"{e}, at depth: {d}");
+            await SearchNext(2);
+            
+            for (int d = 0; d < 24; d++) 
+            { 
+                await SearchNext(d); 
+                Console.WriteLine($"Finished {d} at {DateTime.Now}");
             }
 
             Console.ReadKey();
@@ -36,11 +30,19 @@ namespace Experiment
 
         public async Awaitable<(Balance, BlockState)> Measure(Board board)
         {
-            await SceneManager.LoadSceneAsync(ExperimentDir + ExperimentName, LoadSceneMode.Additive);
-            var measurement = await FindFirstObjectByType<Experiment>().RunAsync(board);
-            await SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(ExperimentName));
+            try
+            {
+                await SceneManager.LoadSceneAsync(ExperimentDir + ExperimentName, LoadSceneMode.Additive);
+                var measurement = await FindFirstObjectByType<Experiment>().RunAsync(board);
+                await SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(ExperimentName));
 
-            return measurement;
+                return measurement;
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"board {board.BoardToString()}: {e}");
+                throw;
+            }
         }
 
         public async Awaitable SearchNext(int depth)

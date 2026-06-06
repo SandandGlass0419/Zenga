@@ -50,7 +50,7 @@ namespace Experiment
                 byte move = (byte)(1 << i);
                 byte newLayer = layer.RemoveBlock(move);
 
-                if (newLayer != layer)
+                if (newLayer != layer && newLayer != 0)
                 {
                     expanded.Add(newLayer);
                 }

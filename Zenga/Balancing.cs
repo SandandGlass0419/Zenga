@@ -95,6 +95,8 @@ public class CoGBalancing : Balancing
         decimal center = (range.Item1 + range.Item2) / 2;
         decimal rangeLen = (range.Item2 - range.Item1) / 2;
 
+        if (rangeLen <= 0) return Balance.Default;
+        
         decimal balanceValue = (GetBatchCoG(axis) - center) / rangeLen;
 
         return new(balanceValue, axis);
