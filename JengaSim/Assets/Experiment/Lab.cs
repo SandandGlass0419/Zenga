@@ -31,8 +31,6 @@ namespace Experiment
                 await SceneManager.LoadSceneAsync(ExperimentDir + ExperimentName, LoadSceneMode.Additive);
                 var measurement = await FindFirstObjectByType<Experiment>().RunAsync(board);
                 await SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(ExperimentName));
-
-                Debug.Log(measurement.Item2.fixedTime);
                 
                 return measurement;
             }
