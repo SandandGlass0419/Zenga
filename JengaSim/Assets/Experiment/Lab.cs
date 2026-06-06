@@ -16,8 +16,6 @@ namespace Experiment
         public async void Awake()
         {
             Time.timeScale = 100f;
-
-            await SearchNext(2);
             
             for (int d = 0; d < 24; d++) 
             { 
