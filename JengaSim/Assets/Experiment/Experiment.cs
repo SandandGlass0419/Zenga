@@ -8,7 +8,7 @@ namespace Experiment
     {
         public GameObject TowerBuilderObject;
 
-        public int height { get; set; } = 4;
+        public int height { get; set; } = 3;
         public int width { get; set; } = 3;
         
         public CoGBalancing Balancer { get; set; }

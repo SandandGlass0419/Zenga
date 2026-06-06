@@ -68,8 +68,8 @@ namespace Experiment
         public const string SearchDir = "/home/cinnamon/Projects/Zenga/DepthSearch/";    // will be set soon
 
         public static string GetMeasurementFilePath(int depth, int sector, bool fallen) => fallen
-            ? $"d{depth}_fall/measurement_{sector}.csv"
-            : $"d{depth}_survive/measurement_{sector}.csv";
+            ? $"d{depth}/measurement_fall_{sector}.csv"
+            : $"d{depth}/measurement_survive_{sector}.csv";
         
         public string CreateMeasurementFile(int depth, int sector, bool fallen)
         {
@@ -81,8 +81,8 @@ namespace Experiment
         }
 
         public static string GetDepthMapFilePath(int depth, int sector, bool fallen) => fallen
-            ? $"d{depth}_fall/depthmap_{sector}.csv"
-            : $"d{depth}_survive/depthmap_{sector}.csv";
+            ? $"d{depth}/depthmap_fall_{sector}.csv"
+            : $"d{depth}/depthmap_survive_{sector}.csv";
         
         public string CreateDepthMapFile(int depth, int sector, bool fallen)
         {

@@ -17,13 +17,11 @@ namespace Experiment
         {
             Time.timeScale = 100f;
             
-            for (int d = 0; d < 24; d++) 
+            for (int d = 0; d < 18; d++) 
             { 
                 await SearchNext(d); 
                 Console.WriteLine($"Finished {d} at {DateTime.Now}");
             }
-
-            Console.ReadKey();
         }
 
         public async Awaitable<(Balance, BlockState)> Measure(Board board)
@@ -34,6 +32,8 @@ namespace Experiment
                 var measurement = await FindFirstObjectByType<Experiment>().RunAsync(board);
                 await SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(ExperimentName));
 
+                Debug.Log(measurement.Item2.fixedTime);
+                
                 return measurement;
             }
             catch (Exception e)
