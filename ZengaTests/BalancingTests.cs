@@ -10,7 +10,7 @@ public class CoGTests
     [SetUp]
     public void Setup()
     {
-        balancing = new(board.Height, board.Width);
+        balancing = new(3, 3);
     }
 
     [TestCase(0b1011)]
@@ -21,32 +21,45 @@ public class CoGTests
         Assert.That(mass, Is.EqualTo(3m));
     }
 
-    [TestCase(0b101)]
-    public void GetCoGTest(byte layer)
+    [TestCase(0b101, 0)]
+    [TestCase(0b011, 0.5)]
+    public void GetCoGTest(byte layer, decimal cog)
     {
         balancing = new(18, 3);
         var CoG = balancing.GetLayerCoG(layer, balancing.GetLayerMass(layer));
         
-        Assert.That(CoG, Is.EqualTo(0));
+        Assert.That(CoG, Is.EqualTo(cog));
     }
 
     [TestCase(0b100, Axis.X, 0b011)]
     public void UpdateCoGTest(byte layer, Axis axis, byte layer2)
     {
         balancing.UpdateBatchCoG(layer, axis);
-        
-        balancing.UpdateBatchCoG(layer2, axis.Cycle());
+        axis.RefCycle();
+        balancing.UpdateBatchCoG(layer2, axis);
         
         Assert.Pass();
-    }   
+    }
+
+    [Test]
+    public void ResetTest()
+    {
+        balancing.MaxBalance = new(10, Axis.Z);
+        balancing.batchCoG = (100, -100);
+        balancing.batchMass = 10000;
+        
+        balancing.Reset();
+        
+        Assert.Pass();
+    }
     
     [TestCase(0b100, 0b011, 0b100)]
     public void BalanceTest(byte layer, byte layer1, byte layer2)
     {
         balancing.UpdateBatchCoG(layer, Axis.X);
 
-        var balance1 = balancing.GetBalance(layer1, Axis.Y);
-        balancing.UpdateBatchCoG(layer1, Axis.Y);
+        var balance1 = balancing.GetBalance(layer1, Axis.Z);
+        balancing.UpdateBatchCoG(layer1, Axis.Z);
 
         var balance2 = balancing.GetBalance(layer2, Axis.X);
         balancing.UpdateBatchCoG(layer2, Axis.X);
@@ -54,16 +67,19 @@ public class CoGTests
         Assert.Pass();
     }
 
-    [Test]
-    public void CalculateTest()
+    [TestCase(new byte[] {5,5,7,7,7,7,7,7,7})]
+    [TestCase(new byte[] {5, 6, 2, 5, 3, 3, 1, 0, 0})]
+    [TestCase(new byte[] {0b101, 0b101, 0b101, 0b010, 0, 0, 0, 0, 0})]
+    [TestCase(new byte[] { 5, 6, 2, 5, 3, 3, 1, 2, 0 })]
+    public void CalculateTest(byte[] tower)
     {
         Board testBoard = new(height: 3)
         {
-            Tower = [0b101, 0b011, 0b101, 0b010, 0, 0, 0, 0, 0] // height * width
+            Tower = tower // height * width
         };
 
-        CoGBalancing testBalance = new(testBoard.Height, testBoard.Width);
-        var maxbal = testBalance.Calculate(testBoard);
+        //CoGBalancing testBalance = new(testBoard.Height, testBoard.Width);
+        var maxbal = balancing.Calculate(testBoard);
         
         Assert.Pass();
     }

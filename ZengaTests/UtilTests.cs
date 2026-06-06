@@ -15,21 +15,20 @@ public class UtilTests
             Tower = [2, 2, 7, 7, 1, 0, 0, 0, 0]
         };
 
-        var result = ZengaStrings.BoardToString(board);
+        var result = ZengaStrings.ToString(board);
         
-        Assert.That(result, Is.EqualTo("2/2/7/7/1/0/0/0/0 3 3 W"));
+        Assert.That(result, Is.EqualTo("2/2/7/7/1/0/0/0/0 3 3"));
     }
 
     [Test]
     public void StringToBoard()
     {
-        Board? board = ZengaStrings.StringToBoard("2/2/7/7/1/0/0/0/0 3 3 W");
+        Board? board = ZengaStrings.ToBoard("2/2/7/7/1/0/0/0/0 3 3");
 
         Assert.That(board, Is.Not.Null);
         Assert.That(board.heightIndex, Is.EqualTo(4));
-        Assert.That(board.Height, Is.EqualTo(3)); Assert.That(board.Width, Is.EqualTo(3));
+        Assert.That(board.height, Is.EqualTo(3)); Assert.That(board.width, Is.EqualTo(3));
         Assert.That(board.maxHeight, Is.EqualTo(9));
-        Assert.That(board.side, Is.EqualTo(Side.W));
         Assert.That(board.Tower, Is.EqualTo([2, 2, 7, 7, 1, 0, 0, 0, 0]));
     }
 }

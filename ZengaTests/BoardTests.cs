@@ -10,7 +10,7 @@ public class BoardTests
     [Test]
     public void InitPos()
     {
-        Board board = new Board();
+        Board board = new();
         
         board.InitPos();
         
@@ -26,7 +26,7 @@ public class BoardTests
     {
         Board board = new Board();
 
-        bool result = board.ValidatePlace(tower, block);
+        bool result = tower.ValidatePlace(block);
 
         bool pass = false;
         switch (tower, block)
@@ -55,7 +55,7 @@ public class BoardTests
     {
         Board board = new Board();
 
-        bool result = board.ValidateRemove(tower, block);
+        bool result = tower.ValidateRemove(block);
 
         bool pass = false;
         switch (tower, block)
@@ -80,12 +80,12 @@ public class BoardTests
     {
         Board board = new(height: 3)
         {
-            Tower = [0, 1, 2, 1, 0, 0, 1, 1, 0]
+            Tower = [0, 1, 2, 1, 0, 0, 1, 0, 0]
         };
 
         int result = board.GetHeightIndex();
 
-        Assert.That(result, Is.EqualTo(7), $"got {result}");
+        Assert.That(result, Is.EqualTo(6), $"got {result}");
     }
 
     [Test]
@@ -94,11 +94,11 @@ public class BoardTests
         Board board = new();
         board.InitPos();
         
-        board.RemoveBlock(new(0, 16));
+        board.RemoveBlock(0, 16);
 
-        board.RemoveBlock(new((byte)0b111, 2));
+        board.RemoveBlock(0b111, 2);
         
-        board.RemoveBlock(new((byte)0b111, 17));
+        board.RemoveBlock(0b111, 17);
 
         Assert.That(board.heightIndex, Is.EqualTo(16));
     }
@@ -109,11 +109,11 @@ public class BoardTests
         Board board = new();
         board.InitPos();
         
-        board.PlaceBlock(new(1, 18));
+        board.PlaceBlock(1, 18);
         
-        board.PlaceBlock(new(0, 18));
+        board.PlaceBlock(0, 18);
         
-        board.PlaceBlock(new((byte)0b111, 19));
+        board.PlaceBlock(0b111, 19);
         
         Assert.That(board.heightIndex, Is.EqualTo(19));
     }
@@ -124,10 +124,10 @@ public class BoardTests
         Board board = new();
         board.InitPos();
 
-        Move move = new(new((byte)0b101, 3), new((byte)0b001, 3));
+        Move move = new((0b101, 3), (0b001, 3));
         board.ApplyMove(move);
 
-        Assert.That(board.Tower[3], Is.EqualTo((byte)0b011));
+        Assert.That(board.Tower[3], Is.EqualTo(0b011));
     }
     
     [Test]
@@ -136,11 +136,11 @@ public class BoardTests
         Board board = new();
         board.InitPos();
 
-        Move move = new(new((byte)0b101, 3), new((byte)0b001, 18));
+        Move move = new((0b101, 3), (0b001, 18));
         board.ApplyMove(move);
 
-        Assert.That(board.Tower[3], Is.EqualTo((byte)0b010));
-        Assert.That(board.Tower[18], Is.EqualTo((byte)0b001));
+        Assert.That(board.Tower[3], Is.EqualTo(0b010));
+        Assert.That(board.Tower[18], Is.EqualTo(0b001));
     }
 
     [Test]
@@ -149,7 +149,7 @@ public class BoardTests
         Board board = new();
         board.InitPos();
 
-        Move move = new(new((byte)0b101, 3), new(0, 18));
+        Move move = new((0b101, 3), (0b001, 18));
         board.ApplyMove(move);
         
         board.UndoMove(move);
@@ -164,7 +164,7 @@ public class BoardTests
         Board board = new();
         board.InitPos();
 
-        Move move = new(new((byte)0b101, 3), new(0, 3));
+        Move move = new((0b101, 3), (0, 3));
         board.ApplyMove(move);
         
         board.UndoMove(move);

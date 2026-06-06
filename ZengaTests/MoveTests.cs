@@ -7,26 +7,14 @@ public class MoveTests
     [SetUp]
     public void Setup() {}
 
-    [TestCase(1)]
-    [TestCase(0)]
-    [TestCase(-1)]
-    public void CreateBlockmoves(int value)
-    {
-        BlockMove blockMove = new(value, 0);
-        
-        Assert.ByVal(blockMove.movingBlock, Is.EqualTo((int)Math.Pow(2, value)), "should be 2^value");
-    }
-
     [TestCase(0b0, 0b0)]
     [TestCase(0b0, 0b1)]
     [TestCase(0b1, 0b0)]
     [TestCase(0b1, 0b1)]
     public void PlaceCombinationSingle(byte tower, byte block)
     {
-        BlockMove blockMove = new(block, 0);
-
-        var result = blockMove.PlaceTo(tower);
-
+        var result = tower.PlaceBlock(block);
+            
         bool pass = false;
         switch (tower, block)
         {
@@ -49,10 +37,7 @@ public class MoveTests
     [TestCase(0b011, 0b110)]
     public void PlaceCombinationMultiple(byte tower, byte block)
     {
-        BlockMove blockMove = new(block, 0);
-        
-
-        var result = blockMove.PlaceTo(tower);
+        var result = tower.PlaceBlock(block);
 
         bool pass = false;
         switch (tower, block)
