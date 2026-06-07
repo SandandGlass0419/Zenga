@@ -11,11 +11,11 @@ def scatter(xname, yname, file_paths):
     for depth in file_paths:
         for path in depth:
             file = pd.read_csv(path)
-            plt.scatter(file[xname], abs(file[yname]), color=colors[d - 1])
+            plt.scatter(file[xname], abs(file[yname]), alpha=0.5, color=colors[d - 1])
             
-            plt.xlim(0, 2)
+            plt.xlim(0, 50)
             plt.title(f"Depth: {d}")
-            plt.savefig(f"/home/cinnamon/Projects/Zenga/DepthSearch/cruncher/plot_fall_d{d}_magnified.png")
+            plt.savefig(f"/home/cinnamon/Projects/Zenga/DepthSearch/cruncher/plot_survive_d{d}.png")
             plt.clf()
 
         d += 1
@@ -47,4 +47,4 @@ def get_file_paths(maxdepth, fallen): # from depth 1
 
     return depths
 
-scatter("unity_time", "cog_value", get_file_paths(5, True))
+scatter("unity_time", "cog_value", get_file_paths(5, False))
