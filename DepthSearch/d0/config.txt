@@ -1,0 +1,8 @@
+mass = 1
+angdamp = 0.05
+lineardamp = 0.05
+timescale = 100
+fixedtime = 0.02
+height = 3 (9)
+width = 3
+
