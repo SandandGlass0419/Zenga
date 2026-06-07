@@ -171,13 +171,10 @@ namespace Experiment
         {
             int count = 0;
             
-            while (true)
-            {
-                if (!File.Exists(SearchDir + GetMeasurementFilePath(depth, count, fallen))) 
-                    return count == 0 ? 0 : count;
-                
-                count++;
-            }
+            while (File.Exists(SearchDir + GetMeasurementFilePath(depth, count, fallen)))
+            { count++; }
+
+            return count;
         }
     }
 }

@@ -1,3 +1,4 @@
+pos,cog_axis,cog_value,unity_time,unity_state,unity_av,unity_mav,unity_lv,unity_mlv
 6/7/7/7/7/7/7/7/7 3 3,X,0.5,9.279997,SLEEP,0,7,0,1E+16
 5/7/7/7/7/7/7/7/7 3 3,X,0,0.6999998,SLEEP,0,7,0,1E+16
 3/7/7/7/7/7/7/7/7 3 3,X,-0.5,7.319998,SLEEP,0,7,0,1E+16

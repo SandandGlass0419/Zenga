@@ -1,3 +1,4 @@
+pos,cog_axis,cog_value,unity_time,unity_state,unity_av,unity_mav,unity_lv,unity_mlv
 2/4/6/7/7/7/7/7/7 3 3,Z,2,0.71875,BLOCK,0.4178887,7,0.3772428,1E+16
 2/6/4/7/7/7/7/7/7 3 3,X,2,0.34375,BLOCK,0.8262817,7,1.300584,1E+16
 2/4/5/7/7/7/7/7/7 3 3,Z,2,0.75,BLOCK,0.6549394,7,0.3687004,1E+16
