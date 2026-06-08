@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -66,7 +65,7 @@ namespace Experiment
         public Dictionary<string, string[]> SurvivedBuffer = new();
     
         public const string SearchDir = "/home/cinnamon/Projects/Zenga/DepthSearch/";
-        public const string Indexes = "board,cog_axis,cog_value,unity_time,unity_state,unity_av,unity_mav,unity_lv,unity_mlv\n";
+        public const string Indexes = "board,cog_axis,cog_value,unity_time,unity_state,unity_mav,unity_mlv\n";
 
         public static string GetMeasurementFilePath(int depth, int sector, bool fallen) => fallen
             ? $"d{depth}/measurement_fall_{sector}.csv"
@@ -121,9 +120,7 @@ namespace Experiment
                 result.Item2.fixedTime.ToString(),
                 result.Item2.testState.ToString(),
                 result.Item2.axis.Cycle().ToString(),   // cycle to represent rotation direction
-                result.Item2.angularVelocity.ToString(),
                 result.Item2.maxAngularVelocity.ToString(),
-                result.Item2.linearVelocity.ToString(),
                 result.Item2.maxLinearVelocity.ToString()
             };
             

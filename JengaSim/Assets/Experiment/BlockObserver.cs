@@ -98,8 +98,6 @@ namespace Experiment
                 pos = transform.localPosition,
                 rotation = transform.localRotation,
                 fixedTime = Time.fixedTime - startFixedTime,
-                angularVelocity = rigidBody.angularVelocity.magnitude,
-                linearVelocity = rigidBody.linearVelocity.magnitude,
                 maxAngularVelocity = MaxAngularVelocity,
                 maxLinearVelocity = MaxLinearVelocity,
                 testState = state
