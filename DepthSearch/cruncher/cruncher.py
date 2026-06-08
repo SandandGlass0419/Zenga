@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os.path
 
-search_dir = "/home/cinnamon/Projects/Zenga/DepthSearch/zenga9a/"
+search_dir = "/home/cinnamon/Projects/Zenga/DepthSearch/zenga9p/"
+fallen = True
+filenamepart = "fall" if fallen else "survive"
 
 def scatter(xname, yname, file_paths):
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
@@ -15,7 +17,7 @@ def scatter(xname, yname, file_paths):
             
             plt.xlim(0, 50)
             plt.title(f"Depth: {d}")
-            plt.savefig(f"/home/cinnamon/Projects/Zenga/DepthSearch/cruncher/plot_survive_d{d}.png")
+            plt.savefig(f"/home/cinnamon/Projects/Zenga/DepthSearch/cruncher/plot_{filenamepart}_d{d}.png")
             plt.clf()
 
         d += 1
@@ -47,4 +49,4 @@ def get_file_paths(maxdepth, fallen): # from depth 1
 
     return depths
 
-scatter("unity_time", "cog_value", get_file_paths(5, False))
+scatter("unity_time", "cog_value", get_file_paths(6, fallen))
