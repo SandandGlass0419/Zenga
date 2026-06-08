@@ -65,7 +65,7 @@ namespace Experiment
         public Dictionary<string, string[]> SurvivedBuffer = new();
     
         public const string SearchDir = "/home/cinnamon/Projects/Zenga/DepthSearch/";
-        public const string Indexes = "board,cog_axis,cog_value,unity_time,unity_state,unity_mav,unity_mlv\n";
+        public const string Indexes = "board,cog_axis,cog_value,unity_time,unity_state,unity_axis,unity_mav,unity_mlv\n";
 
         public static string GetMeasurementFilePath(int depth, int sector, bool fallen) => fallen
             ? $"d{depth}/measurement_fall_{sector}.csv"
