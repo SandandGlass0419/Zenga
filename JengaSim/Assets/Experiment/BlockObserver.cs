@@ -10,11 +10,32 @@ namespace Experiment
         public BlockState StartBlockState;
         public List<BlockState> Neighbors;
     
-        private Rigidbody rigidBody;
-        private float startFixedTime;
+        public Rigidbody rigidBody { get; set; }
+        public float startFixedTime { get; set; }
+
+        private float maxAngularVelocity;
+        public float MaxAngularVelocity
+        {
+            get => maxAngularVelocity;
+            set
+            {
+                maxAngularVelocity = value > maxAngularVelocity ? value : maxAngularVelocity;
+            }
+        }
+
+        private float maxLinearVelocity;
+        public float MaxLinearVelocity
+        {
+            get => maxLinearVelocity;
+            set
+            {
+                maxLinearVelocity = value > maxLinearVelocity ? value : maxLinearVelocity;
+            }
+        }
 
         public event EventHandler<ActionEventArgs> MotionFinishedEvent;
-        public bool sleeping = false;
+        public bool sleeping { get; set; } = false;
+        
         public const float maxTime = 300f;
 
         public void Initialize(BlockState startBlockState, List<BlockState> neighbors)
@@ -29,6 +50,9 @@ namespace Experiment
         {
             if (Time.fixedTime - startFixedTime <= 0.04) return;
 
+            MaxAngularVelocity = rigidBody.angularVelocity.magnitude;
+            MaxLinearVelocity = rigidBody.linearVelocity.magnitude;
+            
             if (Time.fixedTime - startFixedTime > maxTime)
             {
                 OnAction(TestStates.TIMEOUT);
@@ -66,6 +90,9 @@ namespace Experiment
 
         public void OnAction(TestStates state)
         {
+            MaxAngularVelocity = rigidBody.angularVelocity.magnitude;
+            MaxLinearVelocity = rigidBody.linearVelocity.magnitude;
+            
             BlockState onFallBlockState = new(StartBlockState.index, StartBlockState.block, StartBlockState.axis)
             {
                 pos = transform.localPosition,
@@ -73,8 +100,8 @@ namespace Experiment
                 fixedTime = Time.fixedTime - startFixedTime,
                 angularVelocity = rigidBody.angularVelocity.magnitude,
                 linearVelocity = rigidBody.linearVelocity.magnitude,
-                maxAngularVelocity = rigidBody.maxAngularVelocity,
-                maxLinearVelocity = rigidBody.maxLinearVelocity,
+                maxAngularVelocity = MaxAngularVelocity,
+                maxLinearVelocity = MaxLinearVelocity,
                 testState = state
             };
 

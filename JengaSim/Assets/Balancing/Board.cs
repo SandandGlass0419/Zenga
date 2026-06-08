@@ -29,7 +29,7 @@ namespace Balancing
             this.width = Width; // <= 8 (byte)
             this.maxHeight = this.width * this.height;
         
-            this.Tower = new byte[maxHeight];
+            this.Tower = new byte[maxHeight];   // do not initialize tower since new Board() has to represent blank value
             // heightIndex set on setter of Tower
         }
     
