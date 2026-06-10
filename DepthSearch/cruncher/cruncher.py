@@ -2,23 +2,22 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os.path
 
-search_dir = "/home/cinnamon/Projects/Zenga/DepthSearch/zenga9p/"
-fallen = True
-filenamepart = "fall" if fallen else "survive"
+search_dir = "/home/cinnamon/Projects/Zenga/DepthSearch/zenga9p4/"
+maxdepth = 6
 
-def scatter(xname, yname, file_paths):
+def scatter(xname, yname, fallen, xlim):
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
     
     d = 1
-    for depth in file_paths:
+    for depth in get_file_paths(maxdepth, fallen):
         for path in depth:
             file = pd.read_csv(path)
             plt.scatter(file[xname], abs(file[yname]), alpha=0.5, color=colors[d - 1])
-            
-            plt.xlim(0, 50)
-            plt.title(f"Depth: {d}")
-            plt.savefig(f"/home/cinnamon/Projects/Zenga/DepthSearch/cruncher/plot_{filenamepart}_d{d}.png")
-            plt.clf()
+        
+        plt.xlim(0, xlim)
+        plt.title(f"Depth: {d}")
+        plt.savefig(f"/home/cinnamon/Projects/Zenga/DepthSearch/cruncher/plot_{"fallen" if fallen else "survive"}_{xlim}_d{d}.png")
+        plt.clf()
 
         d += 1
 
@@ -49,4 +48,7 @@ def get_file_paths(maxdepth, fallen): # from depth 1
 
     return depths
 
-scatter("unity_time", "cog_value", get_file_paths(6, fallen))
+scatter("unity_mlv", "cog_value", True, 3.5)
+#scatter("unity_mav", "cog_value", True, 2)
+scatter("unity_mlv", "cog_value", False, 3.5)
+scatter("unity_mlv", "cog_value", False, 0.5)
